@@ -83,14 +83,11 @@ This diagram illustrates:
 
 See the iOS MCP Server in action:
 
-<video width="800" controls>
-  <source src="mobile_mcp.mov" type="video/quicktime">
-  Your browser does not support the video tag.
-</video>
+[![iOS MCP Server Demo](https://img.youtube.com/vi/hsWoVRJi2i0/maxresdefault.jpg)](https://youtu.be/hsWoVRJi2i0)
 
 *Demo showing Claude Desktop automatically controlling iOS Simulator: launching apps, taking screenshots, tapping UI elements, and typing text through natural language commands.*
 
-**Alternative:** You can also [download the demo video](mobile_mcp.mov) directly (43MB).
+**🎥 [Watch on YouTube](https://youtu.be/hsWoVRJi2i0)** | **📥 [Download Original](mobile_mcp.mov)** (43MB)
 
 ## 📱 Features
 
