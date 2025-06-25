@@ -39,7 +39,7 @@ Download from: https://claude.ai/download
    {
      "mcpServers": {
        "ios-automation": {
-         "command": "/Users/riju/Documents/mcp-server-demo/.build/release/ios-mcp-server",
+         "command": "/YOUR/PROJECT/PATH/ios_mcp_env/bin/python3",
          "args": [],
          "env": {}
        }

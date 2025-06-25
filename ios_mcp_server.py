@@ -51,10 +51,69 @@ async def run_command(cmd: list[str]) -> tuple[str, bool]:
         logger.error(f"💥 Exception running command {' '.join(cmd)}: {str(e)}")
         return f"Error: {str(e)}", False
 
+@server.list_resources()
+async def handle_list_resources() -> list[types.Resource]:
+    """List available MCP resources"""
+    logger.info("📚 Claude Desktop requested resource list")
+    return [
+        types.Resource(
+            uri="simulator://current-state",
+            name="Current Simulator State",
+            description="Live status of all iOS simulators",
+            mimeType="application/json"
+        ),
+        types.Resource(
+            uri="accessibility://hierarchy",
+            name="Accessibility Tree",
+            description="Current app's accessibility hierarchy for UI automation",
+            mimeType="application/json"
+        ),
+        types.Resource(
+            uri="logs://simulator",
+            name="Simulator Logs",
+            description="System and application logs from iOS Simulator",
+            mimeType="text/plain"
+        )
+    ]
+
+@server.list_prompts()
+async def handle_list_prompts() -> list[types.Prompt]:
+    """List available MCP prompts"""
+    logger.info("💬 Claude Desktop requested prompt list")
+    return [
+        types.Prompt(
+            name="ios-app-test",
+            description="Generate comprehensive iOS app testing workflow",
+            arguments=[
+                types.PromptArgument(
+                    name="app_name",
+                    description="Name of the iOS app to test",
+                    required=True
+                ),
+                types.PromptArgument(
+                    name="test_scenarios",
+                    description="Comma-separated list of test scenarios",
+                    required=False
+                )
+            ]
+        ),
+        types.Prompt(
+            name="ios-automation-debug",
+            description="Debug iOS automation issues step by step",
+            arguments=[
+                types.PromptArgument(
+                    name="error_description",
+                    description="Description of the automation error encountered",
+                    required=True
+                )
+            ]
+        )
+    ]
+
 @server.list_tools()
 async def handle_list_tools() -> list[types.Tool]:
     """List available iOS automation tools"""
-    logger.info("📋 Claude Desktop requested tool list")
+    logger.info("🔧 Claude Desktop requested tool list")
     tools = [
         types.Tool(
             name="list_simulators",
@@ -657,6 +716,131 @@ async def handle_call_tool(name: str, arguments: dict | None) -> list[types.Text
     else:
         logger.error(f"❌ Unknown tool requested: {name}")
         return [types.TextContent(type="text", text=f"❌ Unknown tool: {name}")]
+
+@server.read_resource()
+async def handle_read_resource(uri: str) -> str:
+    """Handle resource reading requests"""
+    logger.info(f"📖 Reading resource: {uri}")
+    
+    if uri == "simulator://current-state":
+        output, success = await run_command(["xcrun", "simctl", "list", "devices", "--json"])
+        if success:
+            return output
+        else:
+            return json.dumps({"error": "Failed to get simulator state", "details": output})
+    
+    elif uri == "accessibility://hierarchy":
+        # Get accessibility tree from booted simulator
+        output, success = await run_command(["xcrun", "simctl", "status_bar", "booted", "list"])
+        if success:
+            return json.dumps({"accessibility_tree": "Feature coming soon", "status": output})
+        else:
+            return json.dumps({"error": "Failed to get accessibility tree", "details": output})
+    
+    elif uri == "logs://simulator":
+        # Get recent simulator logs
+        output, success = await run_command(["xcrun", "simctl", "spawn", "booted", "log", "show", "--last", "10m"])
+        if success:
+            return output
+        else:
+            return f"Failed to get simulator logs: {output}"
+    
+    else:
+        logger.error(f"❌ Unknown resource URI: {uri}")
+        return json.dumps({"error": f"Unknown resource: {uri}"})
+
+@server.get_prompt()
+async def handle_get_prompt(name: str, arguments: dict[str, str] | None) -> types.GetPromptResult:
+    """Handle prompt requests"""
+    logger.info(f"💬 Generating prompt: {name}")
+    
+    if name == "ios-app-test":
+        app_name = arguments.get("app_name", "Unknown App") if arguments else "Unknown App"
+        test_scenarios = arguments.get("test_scenarios", "basic functionality") if arguments else "basic functionality"
+        
+        prompt_content = f"""# iOS App Testing Workflow for {app_name}
+
+## Test Scenarios: {test_scenarios}
+
+### 1. Environment Setup
+- Boot iPhone simulator
+- Take initial screenshot
+- Verify app is installed
+
+### 2. App Launch Testing
+- Launch {app_name}
+- Verify app loads successfully
+- Take screenshot of main screen
+
+### 3. UI Testing
+- Extract accessibility tree
+- Test major UI elements
+- Verify navigation works
+
+### 4. Functionality Testing
+Based on scenarios: {test_scenarios}
+
+### 5. Cleanup
+- Take final screenshots
+- Terminate app
+- Generate test report
+
+Use the iOS MCP Server tools to execute each step systematically."""
+
+        return types.GetPromptResult(
+            description=f"iOS testing workflow for {app_name}",
+            messages=[
+                types.PromptMessage(
+                    role="user",
+                    content=types.TextContent(type="text", text=prompt_content)
+                )
+            ]
+        )
+    
+    elif name == "ios-automation-debug":
+        error_description = arguments.get("error_description", "Unknown error") if arguments else "Unknown error"
+        
+        debug_content = f"""# iOS Automation Debug Assistant
+
+## Error Description: {error_description}
+
+### Debug Steps:
+
+1. **Check Simulator State**
+   - List all simulators
+   - Verify simulator is booted
+   - Check simulator logs
+
+2. **Verify App State**
+   - List installed apps
+   - Check if target app is running
+   - Take screenshot to see current state
+
+3. **Test Basic Functionality**
+   - Try simple tap coordinate
+   - Test accessibility tree extraction
+   - Verify permissions
+
+4. **Common Solutions**
+   - Restart simulator if needed
+   - Check accessibility permissions
+   - Verify app bundle ID
+
+Let me help you debug this step by step using the iOS MCP Server tools."""
+
+        return types.GetPromptResult(
+            description=f"Debug iOS automation issue: {error_description}",
+            messages=[
+                types.PromptMessage(
+                    role="user", 
+                    content=types.TextContent(type="text", text=debug_content)
+                )
+            ]
+        )
+    
+    else:
+        logger.error(f"❌ Unknown prompt: {name}")
+        raise ValueError(f"Unknown prompt: {name}")
 
 async def main():
     """Main server entry point"""

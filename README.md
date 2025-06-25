@@ -319,6 +319,27 @@ See the iOS MCP Server in action:
 
 ## ⚡ Quick Start
 
+### 🚀 **Option 1: Automated Setup (Recommended)**
+```bash
+git clone <your-repo-url>
+cd mcp-server-demo-proj
+
+# Run the automated setup script
+python3 automated_setup.py
+```
+
+The automated setup will:
+- ✅ Create and configure virtual environment
+- ✅ Install all dependencies
+- ✅ Configure Claude Desktop automatically
+- ✅ Check for Cursor IDE compatibility
+- ✅ Create launcher scripts
+- ✅ Run comprehensive tests
+
+**Then just restart Claude Desktop and you're ready to go!**
+
+### 🔧 **Option 2: Manual Setup**
+
 ### 1. Clone and Setup
 ```bash
 git clone <your-repo-url>
@@ -366,6 +387,38 @@ cp claude_desktop_config.json "$HOME/Library/Application Support/Claude/claude_d
 ```
 
 4. Restart Claude Desktop
+
+## 🔌 MCP Client Compatibility
+
+### ✅ **Currently Supported**
+- **Claude Desktop** - Full native MCP support
+- **Manual CLI** - Direct server execution for testing
+
+### ⚠️ **Partial/Future Support**
+- **Cursor IDE** - No native MCP support yet (as of 2024)
+- **Continue.dev** - VS Code extension with potential MCP integration
+- **Zed Editor** - May add MCP support in future versions
+
+### 🔧 **Using with Cursor IDE**
+While Cursor doesn't natively support MCP yet, you can:
+1. Use the automated setup to configure everything
+2. Use Claude Desktop alongside Cursor for AI assistance
+3. Run the MCP server manually for testing: `./start_mcp_server.sh`
+
+### 📱 **Testing without IDE Integration**
+```bash
+# Start server manually for testing
+./start_mcp_server.sh
+
+# In another terminal, test specific tools
+python3 -c "
+import asyncio
+import sys
+sys.path.insert(0, '.')
+import ios_mcp_server
+# Test your tools here
+"
+```
 
 ## 🚨 Troubleshooting
 

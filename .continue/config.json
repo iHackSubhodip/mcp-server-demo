@@ -1,0 +1,70 @@
+{
+    "models": [
+        {
+            "title": "Claude 3.5 Sonnet",
+            "provider": "anthropic",
+            "model": "claude-3-5-sonnet-20241022",
+            "apiKey": "YOUR_ANTHROPIC_API_KEY"
+        }
+    ],
+    "contextProviders": [
+        {
+            "name": "file",
+            "params": {}
+        },
+        {
+            "name": "folder",
+            "params": {}
+        },
+        {
+            "name": "codebase",
+            "params": {}
+        }
+    ],
+    "slashCommands": [
+        {
+            "name": "edit",
+            "description": "Edit code in the current file"
+        },
+        {
+            "name": "comment",
+            "description": "Write comments for the current file"
+        }
+    ],
+    "customCommands": [
+        {
+            "name": "ios-test",
+            "description": "Test iOS MCP Server functionality",
+            "prompt": "Help me test the iOS MCP Server tools. List available simulators and take a screenshot."
+        },
+        {
+            "name": "ios-debug",
+            "description": "Debug iOS automation issues",
+            "prompt": "Help me debug iOS automation. Check simulator status and accessibility tree."
+        }
+    ],
+    "docs": [
+        {
+            "title": "iOS MCP Server",
+            "startUrl": "file://README.md"
+        }
+    ],
+    "systemMessage": "You are an expert iOS developer assistant with access to iOS automation tools via MCP server. You can help with simulator management, app testing, UI automation, and debugging iOS applications.",
+    "experimental": {
+        "mcp": {
+            "enabled": false,
+            "servers": [
+                {
+                    "name": "ios-automation",
+                    "command": "./ios_mcp_env/bin/python3",
+                    "args": [
+                        "ios_mcp_server.py"
+                    ],
+                    "env": {
+                        "PYTHONPATH": "."
+                    }
+                }
+            ]
+        }
+    }
+}
