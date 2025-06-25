@@ -169,6 +169,86 @@ cp claude_desktop_config.json "$HOME/Library/Application Support/Claude/claude_d
 
 4. Restart Claude Desktop
 
+## 🚨 Troubleshooting
+
+If the server starts but Claude Desktop doesn't recognize it:
+
+### **Check Configuration File Location**
+```bash
+# Verify the config file exists
+ls -la "$HOME/Library/Application Support/Claude/claude_desktop_config.json"
+
+# Check the content
+cat "$HOME/Library/Application Support/Claude/claude_desktop_config.json"
+```
+
+### **Verify Paths in Configuration**
+Make sure all paths in your config are **absolute paths** and **actually exist**:
+```bash
+# Check if Python executable exists
+ls -la /YOUR/PROJECT/PATH/ios_mcp_env/bin/python3
+
+# Check if the script exists  
+ls -la /YOUR/PROJECT/PATH/ios_mcp_server.py
+
+# Check if the project directory exists
+ls -la /YOUR/PROJECT/PATH/
+```
+
+### **Run Diagnostic Script**
+```bash
+# Run the automated diagnostic to check your setup
+python3 debug_mcp_setup.py
+```
+
+### **Test MCP Server Directly**
+```bash
+# Test if the server can start without Claude Desktop
+cd /YOUR/PROJECT/PATH
+source ios_mcp_env/bin/activate
+python3 ios_mcp_server.py
+```
+
+### **Check Claude Desktop Logs**
+```bash
+# View Claude Desktop logs for MCP errors
+tail -f ~/Library/Logs/Claude/mcp*.log
+```
+
+### **Common Issues & Solutions**
+
+1. **"Connected to Claude Desktop" but tools don't appear**
+   - Restart Claude Desktop completely (quit and reopen)
+   - Clear Claude Desktop cache: `rm -rf ~/Library/Caches/Claude`
+
+2. **Permission denied errors**
+   - Make sure Python executable is executable: `chmod +x ios_mcp_env/bin/python3`
+   - Check if Terminal has accessibility permissions (System Preferences → Security & Privacy → Accessibility)
+
+3. **Path not found errors**
+   - Use absolute paths only (no `~` or relative paths)
+   - Verify paths exist and are accessible
+
+4. **ImportError for mcp module**
+   - Reinstall in virtual environment: `pip install --upgrade mcp`
+   - Check virtual environment activation: `which python3` should show your venv path
+
+### **Complete Working Example**
+Replace with your actual paths:
+```json
+{
+  "mcpServers": {
+    "ios-automation": {
+      "command": "/Users/yourusername/projects/ios-automation-mcp-server/ios_mcp_env/bin/python3",
+      "args": ["/Users/yourusername/projects/ios-automation-mcp-server/ios_mcp_server.py"],
+      "env": {
+        "PYTHONPATH": "/Users/yourusername/projects/ios-automation-mcp-server"
+      }
+    }
+  }
+}
+```
+
 ## 🎯 Available Tools (13 Total)
 
 ### **Simulator Management (4 tools)**
