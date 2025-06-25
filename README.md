@@ -79,6 +79,14 @@ This diagram illustrates:
 - **System Integration**: Interaction with iOS Simulator via simctl and AppleScript
 - **Response Flow**: How results and screenshots are returned to the AI assistant
 
+## 🎬 Live Demo
+
+See the iOS MCP Server in action:
+
+![iOS MCP Server Demo](mobile_mcp.mov)
+
+*Demo showing Claude Desktop automatically controlling iOS Simulator: launching apps, taking screenshots, tapping UI elements, and typing text through natural language commands.*
+
 ## 📱 Features
 
 ### **Simulator Management**
