@@ -67,6 +67,203 @@ graph TB
 3. **System Tools** → **iOS Simulator** (Direct automation)
 4. **Results/Screenshots** → **Claude Desktop** (Response data)
 
+## 🏗️ High-Level Architecture
+
+### **Design Principles**
+
+The iOS MCP Server follows a **layered architecture** designed for:
+- **Reliability**: Robust error handling and graceful failure recovery
+- **Extensibility**: Modular tool design for easy feature additions
+- **Performance**: Asynchronous operations and efficient resource usage
+- **Security**: Sandboxed execution with controlled system access
+
+### **Core Components**
+
+#### **1. MCP Protocol Layer**
+```
+┌─────────────────────────────────────────────────────────┐
+│                Claude Desktop                           │
+│  ┌─────────────────────────────────────────────────┐    │
+│  │            AI Assistant                         │    │
+│  │  • Natural language processing                  │    │
+│  │  • Intent recognition                          │    │
+│  │  • Context management                          │    │
+│  └─────────────────────────────────────────────────┘    │
+└─────────────────────────────────────────────────────────┘
+                            │
+                   JSON-RPC over stdio
+                            │
+┌─────────────────────────────────────────────────────────┐
+│                 MCP Server                              │
+│  ┌─────────────────────────────────────────────────┐    │
+│  │        Protocol Handler                         │    │
+│  │  • JSON-RPC message parsing                     │    │
+│  │  • Tool discovery & registration               │    │
+│  │  • Resource management                         │    │
+│  │  • Error handling & logging                    │    │
+│  └─────────────────────────────────────────────────┘    │
+└─────────────────────────────────────────────────────────┘
+```
+
+#### **2. Tool Orchestration Layer**
+```
+┌─────────────────────────────────────────────────────────┐
+│                Tool Manager                             │
+│                                                         │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐      │
+│  │  Simulator  │  │     App     │  │     UI      │      │
+│  │ Management  │  │ Management  │  │ Automation  │      │
+│  │   Tools     │  │   Tools     │  │   Tools     │      │
+│  └─────────────┘  └─────────────┘  └─────────────┘      │
+│                                                         │
+│  ┌─────────────────────────────────────────────────┐    │
+│  │           Screen Capture Tools                  │    │
+│  └─────────────────────────────────────────────────┘    │
+└─────────────────────────────────────────────────────────┘
+```
+
+#### **3. System Integration Layer**
+```
+┌─────────────────────────────────────────────────────────┐
+│               System Adapters                           │
+│                                                         │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐      │
+│  │   simctl    │  │ AppleScript │  │ File System │      │
+│  │  Command    │  │ Automation  │  │  Operations │      │
+│  │ Executor    │  │   Engine    │  │             │      │
+│  └─────────────┘  └─────────────┘  └─────────────┘      │
+└─────────────────────────────────────────────────────────┘
+                            │
+                    Native macOS APIs
+                            │
+┌─────────────────────────────────────────────────────────┐
+│                iOS Simulator                            │
+│  ┌─────────────────────────────────────────────────┐    │
+│  │            Target Applications                  │    │
+│  │  • User apps under test                        │    │
+│  │  • System apps and services                    │    │
+│  │  • UI accessibility hierarchy                  │    │
+│  └─────────────────────────────────────────────────┘    │
+└─────────────────────────────────────────────────────────┘
+```
+
+### **Architectural Patterns**
+
+#### **Command Pattern Implementation**
+Each tool implements the command pattern for:
+- **Encapsulation**: Tool logic is self-contained
+- **Undo/Redo**: Future support for operation reversal
+- **Logging**: Comprehensive audit trail
+- **Error Recovery**: Graceful handling of failures
+
+#### **Adapter Pattern for System Integration**
+```python
+# Abstract interface for all system operations
+class SystemAdapter:
+    async def execute_command(self, command: str) -> Result
+    
+# Concrete implementations
+class SimctlAdapter(SystemAdapter):
+    # Handles iOS Simulator operations
+    
+class AppleScriptAdapter(SystemAdapter):
+    # Handles UI automation via AppleScript
+```
+
+#### **Factory Pattern for Tool Creation**
+```python
+class ToolFactory:
+    def create_tool(self, tool_type: str) -> Tool:
+        # Dynamic tool instantiation based on type
+```
+
+### **Cross-Cutting Concerns**
+
+#### **Error Handling Strategy**
+```
+┌─────────────────────────────────────────────────────────┐
+│                 Error Handling                          │
+│                                                         │
+│  Client Error     │  Server Error     │  System Error   │
+│  ┌─────────────┐  │  ┌─────────────┐  │  ┌─────────────┐ │
+│  │ Validation  │  │  │  Internal   │  │  │   macOS     │ │
+│  │   Errors    │  │  │ Processing  │  │  │ System API  │ │
+│  │             │  │  │   Errors    │  │  │   Errors    │ │
+│  └─────────────┘  │  └─────────────┘  │  └─────────────┘ │
+│        │          │        │          │        │         │
+│        └──────────┼────────┼──────────┼────────┘         │
+│                   │        │          │                  │
+│  ┌─────────────────────────────────────────────────────┐ │
+│  │             Centralized Error Handler              │ │
+│  │  • Categorization and severity assessment          │ │
+│  │  • Structured logging with context                 │ │
+│  │  • User-friendly error messages                    │ │
+│  │  • Automatic retry for transient failures          │ │
+│  └─────────────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────────┘
+```
+
+#### **Logging & Observability**
+- **Structured logging**: JSON format with contextual metadata
+- **Performance metrics**: Execution time tracking for each tool
+- **Audit trail**: Complete record of all operations
+- **Debug information**: Detailed system state capture
+
+#### **Resource Management**
+- **Connection pooling**: Efficient use of system resources
+- **Memory management**: Automatic cleanup of temporary files
+- **Concurrent execution**: Thread-safe operations where applicable
+- **Rate limiting**: Protection against excessive API calls
+
+### **Security Model**
+
+#### **Principle of Least Privilege**
+```
+┌─────────────────────────────────────────────────────────┐
+│                Security Boundaries                      │
+│                                                         │
+│  MCP Server Sandbox                                     │
+│  ┌─────────────────────────────────────────────────┐    │
+│  │  • Limited file system access                  │    │
+│  │  • Controlled subprocess execution             │    │
+│  │  • No network access (stdio only)              │    │
+│  │  • Isolated virtual environment               │    │
+│  └─────────────────────────────────────────────────┘    │
+│                            │                            │
+│         Controlled Escalation                           │
+│                            │                            │
+│  macOS System Permissions                               │
+│  ┌─────────────────────────────────────────────────┐    │
+│  │  • Accessibility API access                    │    │
+│  │  • iOS Simulator control                       │    │
+│  │  • Screen capture permissions                  │    │
+│  │  • AppleScript execution rights                │    │
+│  └─────────────────────────────────────────────────┘    │
+└─────────────────────────────────────────────────────────┘
+```
+
+### **Scalability Considerations**
+
+#### **Horizontal Scaling**
+- **Multiple simulator support**: Concurrent operations across simulators
+- **Load balancing**: Distribution of operations across available resources
+- **Session management**: Isolated contexts for different automation tasks
+
+#### **Vertical Scaling**
+- **Async operations**: Non-blocking I/O for improved throughput
+- **Resource optimization**: Efficient memory and CPU usage
+- **Caching**: Intelligent caching of expensive operations
+
+### **Extension Points**
+
+The architecture supports extension through:
+
+1. **Custom Tool Development**: Plugin-style tool addition
+2. **Protocol Extensions**: Additional MCP resource types
+3. **System Adapters**: Support for additional automation backends
+4. **Output Formats**: Customizable response formatting
+5. **Integration Hooks**: CI/CD and external system integration
+
 ## 🔄 Interaction Sequence
 
 The following sequence diagram shows the detailed interaction flow for a typical iOS automation workflow:
@@ -125,7 +322,7 @@ See the iOS MCP Server in action:
 ### 1. Clone and Setup
 ```bash
 git clone <your-repo-url>
-cd ios-automation-mcp-server
+cd mcp-server-demo-proj
 python3 -m venv ios_mcp_env
 source ios_mcp_env/bin/activate
 pip install -r requirements.txt
@@ -133,7 +330,11 @@ pip install -r requirements.txt
 
 ### 2. Test the Server
 ```bash
-python3 ios_mcp_server.py --help
+# Test server imports correctly
+python3 -c "import ios_mcp_server; print('✅ Server ready!')"
+
+# Run diagnostic script
+python3 debug_mcp_setup.py
 ```
 
 ### 3. Configure with AI Assistant
@@ -200,10 +401,10 @@ python3 debug_mcp_setup.py
 
 ### **Test MCP Server Directly**
 ```bash
-# Test if the server can start without Claude Desktop
+# Test if the server can import without errors
 cd /YOUR/PROJECT/PATH
 source ios_mcp_env/bin/activate
-python3 ios_mcp_server.py
+python3 -c "import ios_mcp_server; print('✅ Server imports successfully')"
 ```
 
 ### **Check Claude Desktop Logs**
@@ -230,16 +431,20 @@ tail -f ~/Library/Logs/Claude/mcp*.log
    - Reinstall in virtual environment: `pip install --upgrade mcp`
    - Check virtual environment activation: `which python3` should show your venv path
 
+5. **Server imports but tools don't appear**
+   - Run the diagnostic script: `python3 debug_mcp_setup.py`
+   - Check Claude Desktop logs for errors
+
 ### **Complete Working Example**
 Replace with your actual paths:
 ```json
 {
   "mcpServers": {
     "ios-automation": {
-      "command": "/Users/yourusername/projects/ios-automation-mcp-server/ios_mcp_env/bin/python3",
-      "args": ["/Users/yourusername/projects/ios-automation-mcp-server/ios_mcp_server.py"],
+      "command": "/Users/yourusername/projects/mcp-server-demo-proj/ios_mcp_env/bin/python3",
+      "args": ["/Users/yourusername/projects/mcp-server-demo-proj/ios_mcp_server.py"],
       "env": {
-        "PYTHONPATH": "/Users/yourusername/projects/ios-automation-mcp-server"
+        "PYTHONPATH": "/Users/yourusername/projects/mcp-server-demo-proj"
       }
     }
   }
@@ -307,61 +512,55 @@ Replace with your actual paths:
 "Show me the current simulator logs and tell me if there are any crash reports in the last hour"
 ```
 
-## 🏗 Architecture
-
-```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   AI Assistant  │◄──►│      MCP        │◄──►│  iOS Simulator  │
-│ (Claude/Cursor) │    │  Swift Server   │    │   + xcrun       │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-                                │
-                                ▼
-                       ┌─────────────────┐
-                       │  iOS Automation │
-                       │    • simctl     │
-                       │    • XCTest     │
-                       │    • Logs       │
-                       └─────────────────┘
-```
-
 ## 🔧 Development
 
 ### **Project Structure**
 ```
-ios-mcp-server/
-├── Package.swift              # Swift Package Manager config
-├── Sources/
-│   └── main.swift            # Main server implementation
-├── README.md                 # This file
-└── .build/                   # Build outputs
+mcp-server-demo-proj/
+├── ios_mcp_server.py           # Main Python MCP server
+├── debug_mcp_setup.py          # Setup diagnostic script
+├── requirements.txt            # Python dependencies
+├── claude_desktop_config.example.json  # Configuration template
+├── ios_mcp_env/               # Virtual environment
+├── test_doc_retrival_agent.py # Test automation script
+├── test_ios_mcp.sh            # Shell test script
+├── mobile_mcp.mov             # Demo video (43MB)
+├── sequence_.png              # Sequence diagram
+├── README.md                  # This file
+└── LICENSE                    # Project license
 ```
 
 ### **Key Dependencies**
-- [MCP Swift SDK](https://github.com/modelcontextprotocol/swift-sdk) - Official MCP implementation
-- [Swift Service Lifecycle](https://github.com/swift-server/swift-service-lifecycle) - Graceful shutdown
-- [Swift Log](https://github.com/apple/swift-log) - Structured logging
+- [MCP Python SDK](https://github.com/modelcontextprotocol/python-sdk) - Official MCP implementation
+- Apple's `simctl` - iOS Simulator command line tools
+- `AppleScript` - macOS UI automation
+- `asyncio` - Asynchronous Python execution
 
-### **Building from Source**
+### **Running from Source**
 ```bash
-# Debug build
-swift build
+# Setup virtual environment
+python3 -m venv ios_mcp_env
+source ios_mcp_env/bin/activate
 
-# Release build (recommended for production)
-swift build -c release
+# Install dependencies
+pip install -r requirements.txt
 
-# Run tests
-swift test
+# Test server
+python3 -c "import ios_mcp_server; print('✅ Server ready!')"
+
+# Run diagnostic
+python3 debug_mcp_setup.py
 ```
 
 ## 🚀 Advanced Usage
 
-### **Custom Simulator Configuration**
-```bash
-# Boot specific simulator
-ios-mcp-server --simulator "iPhone 15 Pro Max"
+### **Custom Tool Development**
+Add new tools by extending the `handle_call_tool` function:
 
-# Custom screenshot directory
-ios-mcp-server --screenshots-dir ~/Desktop/ios-screenshots
+```python
+elif name == "your_custom_tool":
+    # Your implementation here
+    return [types.TextContent(type="text", text="Tool executed!")]
 ```
 
 ### **Integration with CI/CD**
@@ -369,36 +568,23 @@ This server can be integrated into your CI/CD pipeline for automated iOS testing
 
 ```yaml
 # GitHub Actions example
+- name: Setup iOS MCP Server
+  run: |
+    python3 -m venv ios_mcp_env
+    source ios_mcp_env/bin/activate
+    pip install -r requirements.txt
+    
 - name: Run iOS Automation Tests
   run: |
-    ./ios-mcp-server &
-    # Your AI-driven test commands here
-```
-
-## 🔍 Troubleshooting
-
-### **Common Issues**
-
-1. **"xcrun: command not found"**
-   - Install Xcode Command Line Tools: `xcode-select --install`
-
-2. **"No simulators available"**
-   - Launch Xcode and install iOS simulators
-   - Run: `xcrun simctl list devices`
-
-3. **"Permission denied"**
-   - Ensure executable permissions: `chmod +x .build/release/ios-mcp-server`
-
-### **Debug Logging**
-Enable verbose logging by setting log level to debug:
-```swift
-handler.logLevel = .debug
+    source ios_mcp_env/bin/activate
+    python3 test_doc_retrival_agent.py
 ```
 
 ## 🤝 Contributing
 
-This project is designed for internal use but can be extended with:
-- Physical device support (requires additional provisioning)
+This project can be extended with:
+- Additional iOS automation tools
+- Physical device support (requires additional setup)
 - Advanced accessibility analysis
 - Integration with TestFlight
 - Custom UI testing frameworks
@@ -409,7 +595,7 @@ Built with ❤️ for iOS development automation using the [Model Context Protoc
 
 ## 🙏 Acknowledgments
 
-- [MCP Community](https://github.com/modelcontextprotocol) for the excellent Swift SDK
+- [MCP Community](https://github.com/modelcontextprotocol) for the Python SDK
 - [mobile-next/mobile-mcp](https://github.com/mobile-next/mobile-mcp) for inspiration
 - Apple's iOS Simulator and development tools
 
