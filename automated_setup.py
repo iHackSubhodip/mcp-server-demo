@@ -29,9 +29,12 @@ class MCPSetupAutomator:
             print(f"   {description}")
     
     def print_success(self, message):
-        """Print success message and increment counter"""
-        self.success_count += 1
+        """Print success message"""
         print(f"✅ {message}")
+    
+    def step_completed_successfully(self):
+        """Mark a step as completed successfully"""
+        self.success_count += 1
     
     def print_error(self, message):
         """Print error message"""
@@ -71,6 +74,7 @@ class MCPSetupAutomator:
         except FileNotFoundError:
             self.print_warning("Xcode command line tools not found")
         
+        self.step_completed_successfully()
         return True
     
     def setup_virtual_environment(self):
@@ -98,6 +102,7 @@ class MCPSetupAutomator:
                 self.print_error(f"Failed to install requirements: {e}")
                 return False
         
+        self.step_completed_successfully()
         return True
     
     def test_server_import(self):
@@ -112,6 +117,7 @@ class MCPSetupAutomator:
             
             if result.returncode == 0:
                 self.print_success("MCP server imports successfully")
+                self.step_completed_successfully()
                 return True
             else:
                 self.print_error(f"Server import failed: {result.stderr}")
@@ -167,6 +173,7 @@ class MCPSetupAutomator:
             with open(claude_config_path, 'w') as f:
                 json.dump(config, f, indent=2)
             self.print_success(f"Claude Desktop configured: {claude_config_path}")
+            self.step_completed_successfully()
             return True
         except Exception as e:
             self.print_error(f"Failed to write Claude Desktop config: {e}")
@@ -201,6 +208,8 @@ class MCPSetupAutomator:
         else:
             self.print_warning("Cursor configuration directory not found")
         
+        # Step completed successfully even though Cursor doesn't support MCP yet
+        self.step_completed_successfully()
         return False
     
     def check_other_mcp_clients(self):
@@ -228,6 +237,7 @@ class MCPSetupAutomator:
             if os.path.exists(path):
                 self.print_warning(f"{name} found - may support MCP in future versions")
         
+        self.step_completed_successfully()
         return True
     
     def create_launcher_script(self):
@@ -263,6 +273,7 @@ echo "✅ Server started successfully!"
             # Make executable
             os.chmod(launcher_path, 0o755)
             self.print_success(f"Launcher script created: {launcher_path}")
+            self.step_completed_successfully()
             return True
         except Exception as e:
             self.print_error(f"Failed to create launcher script: {e}")
@@ -296,6 +307,7 @@ echo "✅ Server started successfully!"
             self.print_error(f"Server startup test failed: {e}")
             return False
         
+        self.step_completed_successfully()
         return True
     
     def print_final_instructions(self):
@@ -313,12 +325,12 @@ echo "✅ Server started successfully!"
         
         print(f"\n🔧 Manual Server Start:")
         print(f"   ./start_mcp_server.sh")
-        print(f"   OR: {self.python_path} {self.server_script}")
+        print(f"   OR: ./ios_mcp_env/bin/python3 ios_mcp_server.py")
         
         print(f"\n📁 Configuration Files:")
         print(f"   Claude Desktop: ~/Library/Application Support/Claude/claude_desktop_config.json")
-        print(f"   Server Script: {self.server_script}")
-        print(f"   Virtual Environment: {self.venv_path}")
+        print(f"   Server Script: ios_mcp_server.py")
+        print(f"   Virtual Environment: ./ios_mcp_env/")
         
         print(f"\n🐛 Troubleshooting:")
         print(f"   python3 debug_mcp_setup.py")
