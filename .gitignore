@@ -60,7 +60,6 @@ fastlane/report.xml
 fastlane/Preview.html
 fastlane/screenshots/**/*.png
 fastlane/test_output
-ios_mcp_env/
 
 # Python
 __pycache__/
@@ -140,6 +139,9 @@ screenshots/
 .env.local
 .env.production
 .env.staging
+
+# WebDriverAgent (third-party dependency)
+WebDriverAgent/
 
 # Coverage reports
 htmlcov/
