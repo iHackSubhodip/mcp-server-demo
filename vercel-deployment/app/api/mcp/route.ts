@@ -146,14 +146,7 @@ class MockiOSAutomationService {
 const automationService = new MockiOSAutomationService();
 
 // Create and configure the MCP server using Vercel's adapter
-const handler = createMcpHandler({
-  // Server metadata for client identification
-  name: 'ios-mcp-server-vercel',
-  version: '1.0.0',
-  description: 'Professional iOS automation server deployed on Vercel with mock automation capabilities',
-  
-  // Configure the MCP server with tools
-  configure: (server) => {
+const handler = createMcpHandler((server) => {
     
     // ========================================================================
     // TOOL 1: SCREENSHOT CAPTURE
@@ -383,7 +376,6 @@ const handler = createMcpHandler({
         }
       }
     );
-  }
 });
 
 // ============================================================================
