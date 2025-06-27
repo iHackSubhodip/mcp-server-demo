@@ -1,12 +1,25 @@
 # iOS MCP Server
 
-> Professional iOS automation server built with clean architecture and SOLID principles
+> Mobile automation server built with clean architecture and SOLID principles
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 [![Platform: macOS](https://img.shields.io/badge/platform-macOS-lightgrey.svg)](https://www.apple.com/macos/)
 
 A production-ready iOS automation MCP server that transforms monolithic automation scripts into maintainable, extensible architecture. Built following SOLID principles with comprehensive error handling, beautiful logging, and professional design patterns.
+
+## 📺 Demo Video
+
+[![iOS MCP Server Demo](https://img.youtube.com/vi/480AmvL9ziQ/maxresdefault.jpg)](https://www.youtube.com/watch?v=480AmvL9ziQ)
+
+**🎬 Watch the Complete Demo**: [iOS MCP Server in Action](https://www.youtube.com/watch?v=480AmvL9ziQ)
+
+See real iOS automation with Claude Desktop integration! The video demonstrates:
+- **Live iOS Automation** - Real device interaction
+- **Claude Desktop Integration** - Seamless MCP protocol usage  
+- **Advanced Element Finding** - Smart accessibility ID detection
+- **Auto-Dismiss Features** - Modal handling automation
+- **Complete Workflow** - End-to-end app testing
 
 ## ✨ Features
 
