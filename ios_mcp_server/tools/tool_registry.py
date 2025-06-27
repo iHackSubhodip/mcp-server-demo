@@ -12,6 +12,7 @@ from .base_tool import BaseTool
 from .appium_tap_type_tool import AppiumTapTypeTool
 from .screenshot_tool import ScreenshotTool
 from .launch_app_tool import LaunchAppTool
+from .find_and_tap_tool import FindAndTapTool
 from ..utils.logger import get_logger
 
 logger = get_logger(__name__)
@@ -47,6 +48,7 @@ class ToolRegistry:
             AppiumTapTypeTool,
             ScreenshotTool,
             LaunchAppTool,
+            FindAndTapTool,
         ]
         
         self.logger.info(f"🔧 Registering {len(builtin_tools)} built-in tools")

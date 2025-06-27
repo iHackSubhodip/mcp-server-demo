@@ -29,30 +29,30 @@ A production-ready iOS automation MCP server that transforms monolithic automati
 ### Installation
 
 1. **Clone the repository**
-   ```bash
+```bash
    git clone https://github.com/iHackSubhodip/mcp-server-demo.git
    cd mcp-server-demo
    ```
 
 2. **Start the server**
-   ```bash
+```bash
    ./start_ios_mcp.sh
    ```
 
 3. **Connect to Claude Desktop**
    
    Add to your Claude Desktop config:
-   ```json
-   {
-     "mcpServers": {
-       "ios-automation": {
+```json
+{
+  "mcpServers": {
+    "ios-automation": {
          "command": "python",
          "args": ["-m", "ios_mcp_server.main"],
          "cwd": "/path/to/mcp-server-demo"
-       }
-     }
-   }
-   ```
+    }
+  }
+}
+```
 
 ## 🏗️ Architecture
 

@@ -6,6 +6,7 @@ easier to configure and deploy in different environments.
 """
 
 import os
+import sys
 from typing import Optional
 from dataclasses import dataclass
 
@@ -45,8 +46,11 @@ class ServerConfig:
     version: str = "2.0.0"
     log_level: str = "INFO"
     
-    # Virtual environment path for Appium scripts
-    venv_path: str = "/Users/riju/Documents/mcp-server-demo-proj/ios_mcp_env"
+    # Virtual environment path for Appium scripts (dynamically determined)
+    venv_path: str = ""
+    
+    # Python version for site-packages path
+    python_version: str = ""
 
 
 class Settings:
@@ -73,11 +77,17 @@ class Settings:
         )
         
         # Server configuration
+        # Use the directory where this config file is located as the project root
+        config_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        project_root = os.path.dirname(config_dir)
+        default_venv_path = os.path.join(project_root, "ios_mcp_env")
+        python_version = f"python{sys.version_info.major}.{sys.version_info.minor}"
         self.server = ServerConfig(
             name=os.getenv("MCP_SERVER_NAME", "ios-automation-mcp"),
             version=os.getenv("MCP_SERVER_VERSION", "2.0.0"),
             log_level=os.getenv("LOG_LEVEL", "INFO"),
-            venv_path=os.getenv("VENV_PATH", "/Users/riju/Documents/mcp-server-demo-proj/ios_mcp_env")
+            venv_path=os.getenv("VENV_PATH", default_venv_path),
+            python_version=os.getenv("PYTHON_VERSION", python_version)
         )
 
 

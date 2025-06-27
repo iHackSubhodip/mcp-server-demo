@@ -206,6 +206,9 @@ class AppiumClient:
         # Escape text for Python string literals
         escaped_text = text.replace('\\', '\\\\').replace('"', '\\"').replace("'", "\\'")
         
+        # Import settings for configuration
+        from ios_mcp_server.config.settings import settings
+        
         # Generate the automation script with proper error handling
         script = f'''
 import sys
@@ -213,7 +216,7 @@ import os
 
 # Add virtual environment packages to path
 venv_path = "{settings.server.venv_path}"
-site_packages = os.path.join(venv_path, "lib", "python3.13", "site-packages")
+site_packages = os.path.join(venv_path, "lib", "{settings.server.python_version}", "site-packages")
 if os.path.exists(site_packages):
     sys.path.insert(0, site_packages)
 
@@ -241,7 +244,7 @@ def main():
         options.device_name = "{settings.ios.device_name}"
         options.automation_name = "{settings.ios.automation_name}"
         options.no_reset = {settings.ios.no_reset}
-        options.new_command_timeout = {settings.ios.new_command_timeout}
+        options.new_command_timeout = 30
         options.bundle_id = "{bundle_id}"
         
         print(f"Connecting to Appium server at {settings.appium.url}")

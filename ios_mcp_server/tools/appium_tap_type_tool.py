@@ -7,10 +7,26 @@ tapping them, and typing text using real Appium automation.
 
 from typing import Dict, Any, List, Optional
 
-from .base_tool import BaseTool, ToolArgument
-from ..automation.appium_client import AppiumClient
-from ..config.settings import settings
-from ..utils.exceptions import AutomationError
+try:
+    from .base_tool import BaseTool, ToolArgument
+    from ..automation.appium_client import AppiumClient
+    from ..config.settings import settings
+    from ..utils.exceptions import AutomationError
+except ImportError:
+    # Fallback for Claude Desktop context
+    import sys
+    import os
+    
+    # Add the ios_mcp_server to path if not already there
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    parent_dir = os.path.dirname(current_dir)
+    if parent_dir not in sys.path:
+        sys.path.insert(0, parent_dir)
+    
+    from tools.base_tool import BaseTool, ToolArgument
+    from automation.appium_client import AppiumClient
+    from config.settings import settings
+    from utils.exceptions import AutomationError
 
 
 class AppiumTapTypeTool(BaseTool):
@@ -66,7 +82,7 @@ class AppiumTapTypeTool(BaseTool):
             )
         ]
     
-    async def execute_impl(self, text: str, app_bundle_id: str, timeout: int) -> Dict[str, Any]:
+    async def execute_impl(self, text: str, app_bundle_id: str = None, timeout: int = 10) -> Dict[str, Any]:
         """
         Execute the tap and type automation.
         
@@ -82,6 +98,10 @@ class AppiumTapTypeTool(BaseTool):
             AutomationError: If automation fails
         """
         
+        # Use default bundle ID if none provided
+        if app_bundle_id is None:
+            app_bundle_id = settings.ios.default_bundle_id
+            
         self.logger.info(f"🎯 Starting Appium tap and type automation")
         self.logger.debug(f"📱 Target app: {app_bundle_id}")
         self.logger.debug(f"⌨️ Text to type: '{text}'")
