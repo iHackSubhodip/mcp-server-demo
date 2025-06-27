@@ -1,0 +1,280 @@
+/* ============================================================================ */
+/* TAILWIND CSS DIRECTIVES */
+/* ============================================================================ */
+/* Import Tailwind's base styles, components, and utilities */
+/* These provide the foundation for all styling in the application */
+
+@tailwind base;      /* Normalize styles and base element styling */
+@tailwind components; /* Reusable component classes */
+@tailwind utilities;  /* Utility classes for rapid styling */
+
+/* ============================================================================ */
+/* GLOBAL BASE STYLES */
+/* ============================================================================ */
+/* Custom base styles that apply to the entire application */
+
+@layer base {
+  /* Improve font rendering across different browsers and devices */
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+  
+  /* Ensure consistent box-sizing across all elements */
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+  
+  /* Set base font family and line height for better readability */
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+    line-height: 1.6;
+  }
+  
+  /* Improve focus indicators for accessibility */
+  :focus-visible {
+    outline: 2px solid theme('colors.blue.500');
+    outline-offset: 2px;
+  }
+  
+  /* Custom scrollbar styles for webkit browsers */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: theme('colors.gray.100');
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: theme('colors.gray.400');
+    border-radius: 4px;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: theme('colors.gray.500');
+  }
+}
+
+/* ============================================================================ */
+/* CUSTOM COMPONENT STYLES */
+/* ============================================================================ */
+/* Reusable component classes for consistent styling */
+
+@layer components {
+  /* Custom button styles for better consistency */
+  .btn-primary {
+    @apply bg-blue-600 text-white px-4 py-2 rounded-lg font-medium;
+    @apply hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2;
+    @apply transition-colors duration-200 ease-in-out;
+  }
+  
+  .btn-secondary {
+    @apply bg-gray-200 text-gray-900 px-4 py-2 rounded-lg font-medium;
+    @apply hover:bg-gray-300 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2;
+    @apply transition-colors duration-200 ease-in-out;
+  }
+  
+  /* Custom card styles for consistent elevation and spacing */
+  .card {
+    @apply bg-white rounded-lg shadow-lg p-6;
+    @apply border border-gray-200;
+  }
+  
+  .card-hover {
+    @apply card hover:shadow-xl transition-shadow duration-300 ease-in-out;
+  }
+  
+  /* Code block styling for better readability */
+  .code-block {
+    @apply bg-gray-900 text-green-400 p-4 rounded-lg;
+    @apply font-mono text-sm overflow-x-auto;
+    @apply border border-gray-700;
+  }
+  
+  /* Status badge styles */
+  .badge-success {
+    @apply inline-flex items-center px-3 py-1 rounded-full text-sm font-medium;
+    @apply bg-green-100 text-green-800;
+  }
+  
+  .badge-info {
+    @apply inline-flex items-center px-3 py-1 rounded-full text-sm font-medium;
+    @apply bg-blue-100 text-blue-800;
+  }
+  
+  .badge-warning {
+    @apply inline-flex items-center px-3 py-1 rounded-full text-sm font-medium;
+    @apply bg-yellow-100 text-yellow-800;
+  }
+  
+  /* Gradient text effect for headings */
+  .gradient-text {
+    @apply bg-gradient-to-r from-blue-600 to-purple-600;
+    @apply bg-clip-text text-transparent;
+  }
+}
+
+/* ============================================================================ */
+/* CUSTOM UTILITY CLASSES */
+/* ============================================================================ */
+/* Additional utility classes for specific use cases */
+
+@layer utilities {
+  /* Text truncation utilities */
+  .text-truncate-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
+  .text-truncate-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
+  /* Glass morphism effect */
+  .glass {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+  
+  /* Smooth scrolling behavior */
+  .scroll-smooth {
+    scroll-behavior: smooth;
+  }
+  
+  /* Hide scrollbars while maintaining functionality */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  
+  /* Animation utilities */
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+  }
+  
+  .animate-slide-up {
+    animation: slideUp 0.3s ease-out;
+  }
+}
+
+/* ============================================================================ */
+/* CUSTOM ANIMATIONS */
+/* ============================================================================ */
+/* Keyframe animations for enhanced user experience */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* ============================================================================ */
+/* RESPONSIVE DESIGN HELPERS */
+/* ============================================================================ */
+/* Additional responsive utilities for specific breakpoints */
+
+/* Mobile-first approach with custom breakpoints */
+@media (max-width: 640px) {
+  .mobile-stack {
+    @apply flex-col space-y-4 space-x-0;
+  }
+}
+
+@media (min-width: 768px) {
+  .tablet-grid {
+    @apply grid-cols-2;
+  }
+}
+
+@media (min-width: 1024px) {
+  .desktop-grid {
+    @apply grid-cols-3;
+  }
+}
+
+/* ============================================================================ */
+/* DARK MODE SUPPORT (OPTIONAL) */
+/* ============================================================================ */
+/* Uncomment and customize if you want to add dark mode support */
+
+/*
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: 0 0% 3.9%;
+    --foreground: 0 0% 98%;
+  }
+  
+  .dark {
+    @apply bg-gray-900 text-white;
+  }
+  
+  .dark .card {
+    @apply bg-gray-800 border-gray-700;
+  }
+  
+  .dark .code-block {
+    @apply bg-gray-800 border-gray-600;
+  }
+}
+*/
+
+/* ============================================================================ */
+/* PRINT STYLES */
+/* ============================================================================ */
+/* Optimize styles for printing */
+
+@media print {
+  /* Hide interactive elements when printing */
+  .no-print {
+    display: none !important;
+  }
+  
+  /* Ensure good contrast for printed content */
+  * {
+    color: black !important;
+    background: white !important;
+  }
+  
+  /* Optimize spacing for print */
+  .print-compact {
+    margin: 0 !important;
+    padding: 0.5rem !important;
+  }
+} 

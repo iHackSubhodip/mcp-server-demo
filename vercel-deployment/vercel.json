@@ -1,0 +1,59 @@
+{
+  "framework": "nextjs",
+  "functions": {
+    "app/api/mcp/route.ts": {
+      "maxDuration": 300,
+      "memory": 1024
+    }
+  },
+  "regions": ["iad1"],
+  "build": {
+    "env": {
+      "DEPLOYMENT_ENV": "vercel",
+      "NODE_VERSION": "18"
+    }
+  },
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, no-store, must-revalidate"
+        }
+      ]
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/home",
+      "destination": "/",
+      "permanent": false
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/mcp",
+      "destination": "/api/mcp"
+    }
+  ],
+  "env": {
+    "DEPLOYMENT_PLATFORM": "vercel",
+    "MCP_API_VERSION": "1.0.0",
+    "MOCK_IOS_AUTOMATION": "true",
+    "LOG_LEVEL": "info"
+  },
+  "github": {
+    "silent": true
+  },
+  "crons": [
+    {
+      "path": "/api/health",
+      "schedule": "0 */6 * * *"
+    }
+  ]
+} 
