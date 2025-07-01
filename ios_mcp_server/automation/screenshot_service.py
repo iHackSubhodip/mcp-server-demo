@@ -32,7 +32,14 @@ class ScreenshotService:
         Args:
             default_directory: Default directory for saving screenshots
         """
-        self.default_directory = Path(default_directory) if default_directory else Path.cwd()
+        if default_directory:
+            self.default_directory = Path(default_directory)
+        else:
+            # Use project root directory instead of current working directory
+            # to avoid issues when MCP server is started by Claude Desktop
+            project_root = Path(__file__).parent.parent.parent
+            self.default_directory = project_root / "screenshots"
+        
         self.logger = get_logger(__name__)
         
         # Ensure default directory exists

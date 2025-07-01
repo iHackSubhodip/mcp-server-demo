@@ -285,7 +285,8 @@ class iOSMCPServer:
             try:
                 import aiohttp
                 async with aiohttp.ClientSession() as session:
-                    async with session.get(f"{settings.appium.url}/status", timeout=5) as response:
+                    timeout = aiohttp.ClientTimeout(total=5)
+                    async with session.get(f"{settings.appium.url}/status", timeout=timeout) as response:
                         if response.status == 200:
                             health["appium"] = "healthy"
                         else:
