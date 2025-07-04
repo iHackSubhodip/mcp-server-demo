@@ -14,8 +14,9 @@ from typing import Optional, Dict, Any
 from datetime import datetime
 
 from fastmcp import FastMCP, Context
-from starlette.responses import JSONResponse
 from starlette.requests import Request
+from starlette.responses import JSONResponse
+from starlette.middleware import Middleware
 from starlette.middleware.cors import CORSMiddleware
 
 # Add the current directory to sys.path
@@ -31,21 +32,27 @@ from utils.logger import get_logger
 # Initialize logger
 logger = get_logger(__name__)
 
-# Initialize FastMCP server - THIS IS OUR APP
+# 1. Create the FastMCP server instance
 mcp = FastMCP(
     name=f"{settings.server.name} (FastMCP)",
     version="2.0.0"
 )
-# REMOVED app = FastAPI()
 
-# Add CORS middleware to allow all origins
-mcp.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+# 2. Define the middleware stack
+cors_middleware = [
+    Middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+]
+
+# 3. Create the final ASGI app, passing the middleware
+# We will run this `app` object with gunicorn
+app = mcp.http_app(transport="sse", middleware=cors_middleware)
+
 
 # Initialize services only if not in cloud environment
 IS_CLOUD = bool(os.getenv("RAILWAY_ENVIRONMENT") or os.getenv("HEROKU_APP_NAME") or os.getenv("GOOGLE_CLOUD_PROJECT"))
@@ -439,7 +446,10 @@ async def get_server_status(ctx: Optional[Context] = None) -> Dict[str, Any]:
             "fastmcp": True
         }
 
-# Add health check endpoint for cloud deployment
+# Custom routes are now added to the final 'app', not 'mcp'
+# However, the docs show @mcp.custom_route should still work as it modifies
+# the app that http_app() will generate. So we leave these as they are.
+
 @mcp.custom_route("/health", methods=["GET"])
 async def health_check(request: Request) -> JSONResponse:
     """Health check endpoint for cloud deployment monitoring."""
@@ -468,8 +478,9 @@ async def root(request: Request) -> JSONResponse:
     return JSONResponse(content)
 
 
-# REMOVED app.include_router(mcp.router)
-
+# The __main__ block is no longer needed for gunicorn deployment,
+# but we can keep it for local testing. The 'uvicorn.run' will now
+# target our new 'app' object.
 def main():
     """Main entry point for FastMCP server."""
     
@@ -499,9 +510,13 @@ def main():
         logger.info("🔧 Local development mode")
         logger.info("🔧 Available tools: take_screenshot, launch_app, find_and_tap, appium_tap_and_type, list_simulators")
     
-    # Run the FastMCP server
+    # Run the server
     try:
-        mcp.run(transport=transport, host=host, port=port)
+        import uvicorn
+        host = os.getenv("MCP_HOST", "127.0.0.1") # Use 127.0.0.1 for local
+        port = 8000
+        logger.info(f"🚀 Starting local development server on http://{host}:{port}")
+        uvicorn.run(app, host=host, port=port, log_level="debug")
     except KeyboardInterrupt:
         logger.info("\n⏹️ FastMCP server stopped by user")
     except Exception as e:
