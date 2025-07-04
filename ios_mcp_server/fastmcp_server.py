@@ -14,7 +14,7 @@ from typing import Optional, Dict, Any
 from datetime import datetime
 
 from fastmcp import FastMCP, Context
-# REMOVED fastapi imports
+# REMOVED unused starlette import
 
 # Add the current directory to sys.path
 sys.path.insert(0, str(Path(__file__).parent))
@@ -430,7 +430,7 @@ async def get_server_status(ctx: Optional[Context] = None) -> Dict[str, Any]:
 
 # Add health check endpoint for cloud deployment
 @mcp.custom_route("/health", methods=["GET"])
-async def health_check(request) -> Dict[str, Any]:
+async def health_check() -> Dict[str, Any]:
     """Health check endpoint for cloud deployment monitoring."""
     return {
         "status": "healthy",

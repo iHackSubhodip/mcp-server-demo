@@ -1,23 +1,12 @@
-# Core MCP Server Dependencies
-mcp>=1.0.0
-fastmcp>=2.9.2
-
-# HTTP Framework & Server
-fastapi>=0.109.0
-uvicorn>=0.27.0
-gunicorn>=21.2.0
-
-# HTTP client for Appium communication
-aiohttp>=3.9.0
-httpx>=0.25.0
-
-# iOS Automation Stack
-appium-python-client>=3.0.0
-selenium>=4.15.0
-
-# System & Utility
-psutil>=5.9.0
-pillow>=10.0.0
-
-# Async & HTTP
-asyncio-mqtt>=0.16.0 
+fastmcp
+starlette
+uvicorn
+gunicorn
+python-dotenv
+aiohttp
+requests
+psutil
+six
+websockets
+# Adding for the automation tools
+appium-python-client 
