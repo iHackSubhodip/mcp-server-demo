@@ -478,6 +478,18 @@ if not IS_CLOUD:
     find_and_tap_tool = FindAndTapTool()
     logger.info(f"🚀 FastMCP Server initialized with local services")
 else:
+    # Create placeholder services for cloud mode
+    class CloudServicePlaceholder:
+        """Placeholder for services that aren't available in cloud mode"""
+        def __getattr__(self, name):
+            async def method(*args, **kwargs):
+                raise Exception("This service is not available in cloud deployment mode. iOS automation requires local access to simulators.")
+            return method
+    
+    screenshot_service = CloudServicePlaceholder()
+    appium_client = CloudServicePlaceholder()
+    simulator_manager = CloudServicePlaceholder()
+    find_and_tap_tool = CloudServicePlaceholder()
     logger.info(f"☁️ FastMCP Server running in cloud mode - local services disabled")
 
 
@@ -486,7 +498,7 @@ if __name__ == "__main__":
     def main():
         # Get transport configuration - prioritize environment for cloud deployment
         transport = os.getenv("MCP_TRANSPORT", "sse").lower()
-        host = os.getenv("MCP_HOST", "0.0.0.0")
+        
         # Ensure port is read from Railway's PORT env var
         port_str = os.getenv("PORT", os.getenv("MCP_PORT", "8000"))
         try:
@@ -494,6 +506,12 @@ if __name__ == "__main__":
         except (ValueError, TypeError):
             logger.warning(f"Invalid PORT value received: '{port_str}'. Defaulting to 8000.")
             port = 8000
+        
+        # Use 0.0.0.0 for cloud deployments, 127.0.0.1 for local
+        if IS_CLOUD:
+            host = "0.0.0.0"
+        else:
+            host = os.getenv("MCP_HOST", "127.0.0.1")
         
         logger.info(f"🎯 iOS Automation Server (FastMCP 2.0)")
         logger.info(f"🐍 Python: {sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}")
@@ -506,6 +524,7 @@ if __name__ == "__main__":
             logger.info("🌍 Remote deployment - accessible globally via SSE")
             logger.info("🔍 Health check available at /health")
             logger.info(f"📡 SSE endpoint: /sse")
+            logger.info(f"🌐 Server will listen on {host}:{port}")
         else:
             logger.info("🔧 Local development mode")
             logger.info("🔧 Available tools: take_screenshot, launch_app, find_and_tap, appium_tap_and_type, list_simulators")
@@ -513,10 +532,8 @@ if __name__ == "__main__":
         # Run the server
         try:
             import uvicorn
-            host = os.getenv("MCP_HOST", "127.0.0.1") # Use 127.0.0.1 for local
-            port = 8000
-            logger.info(f"🚀 Starting local development server on http://{host}:{port}")
-            uvicorn.run(app, host=host, port=port, log_level="debug")
+            logger.info(f"🚀 Starting server on http://{host}:{port}")
+            uvicorn.run(app, host=host, port=port, log_level="info")
         except KeyboardInterrupt:
             logger.info("\n⏹️ FastMCP server stopped by user")
         except Exception as e:
