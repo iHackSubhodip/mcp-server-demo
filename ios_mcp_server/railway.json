@@ -3,7 +3,7 @@
   "build": {
     "builder": "NIXPACKS",
     "nixpacks": {
-      "installCommand": "pip install -r ios_mcp_server/requirements.txt"
+      "installCommand": "echo '--- Listing files before install ---' && ls -la && echo '--- Installing dependencies ---' && pip install -r ios_mcp_server/requirements.txt"
     }
   },
   "deploy": {
