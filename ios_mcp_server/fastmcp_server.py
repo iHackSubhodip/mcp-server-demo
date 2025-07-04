@@ -16,6 +16,7 @@ from datetime import datetime
 from fastmcp import FastMCP, Context
 from starlette.responses import JSONResponse
 from starlette.requests import Request
+from starlette.middleware.cors import CORSMiddleware
 
 # Add the current directory to sys.path
 sys.path.insert(0, str(Path(__file__).parent))
@@ -36,6 +37,15 @@ mcp = FastMCP(
     version="2.0.0"
 )
 # REMOVED app = FastAPI()
+
+# Add CORS middleware to allow all origins
+mcp.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Initialize services only if not in cloud environment
 IS_CLOUD = bool(os.getenv("RAILWAY_ENVIRONMENT") or os.getenv("HEROKU_APP_NAME") or os.getenv("GOOGLE_CLOUD_PROJECT"))
@@ -466,7 +476,8 @@ def main():
     # Get transport configuration - prioritize environment for cloud deployment
     transport = os.getenv("MCP_TRANSPORT", "sse").lower()
     host = os.getenv("MCP_HOST", "0.0.0.0")
-    port_str = os.getenv("MCP_PORT", os.getenv("PORT", "8000"))
+    # Ensure port is read from Railway's PORT env var
+    port_str = os.getenv("PORT", os.getenv("MCP_PORT", "8000"))
     try:
         port = int(port_str)
     except (ValueError, TypeError):
