@@ -460,11 +460,8 @@ async def root() -> Dict[str, Any]:
         "timestamp": datetime.now().isoformat()
     }
 
-# Add SSE endpoint
-@app.get("/sse")
-async def sse(request: Request):
-    """SSE endpoint for FastMCP communication."""
-    return await mcp.handle_sse_request(request)
+# Include the FastMCP router, which handles SSE and tool calls
+app.include_router(mcp.router)
 
 if __name__ == "__main__":
     import uvicorn
