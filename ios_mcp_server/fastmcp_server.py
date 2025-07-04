@@ -486,7 +486,12 @@ if __name__ == "__main__":
     # Get transport configuration - prioritize environment for cloud deployment
     transport = os.getenv("MCP_TRANSPORT", "sse").lower()
     host = os.getenv("MCP_HOST", "0.0.0.0")  # Changed to 0.0.0.0 for cloud deployment
-    port = int(os.getenv("MCP_PORT", os.getenv("PORT", "8000")))  # Railway uses PORT env var
+    port_str = os.getenv("MCP_PORT", os.getenv("PORT", "8000"))
+    try:
+        port = int(port_str)
+    except (ValueError, TypeError):
+        logger.warning(f"Invalid PORT value received: '{port_str}'. Defaulting to 8000.")
+        port = 8000
     
     logger.info(f"🎯 iOS Automation Server (FastMCP 2.0)")
     logger.info(f"🐍 Python: {sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}")
