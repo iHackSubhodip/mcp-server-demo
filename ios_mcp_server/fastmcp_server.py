@@ -14,7 +14,8 @@ from typing import Optional, Dict, Any
 from datetime import datetime
 
 from fastmcp import FastMCP, Context
-# REMOVED unused starlette import
+from starlette.responses import JSONResponse
+from starlette.requests import Request
 
 # Add the current directory to sys.path
 sys.path.insert(0, str(Path(__file__).parent))
@@ -430,21 +431,23 @@ async def get_server_status(ctx: Optional[Context] = None) -> Dict[str, Any]:
 
 # Add health check endpoint for cloud deployment
 @mcp.custom_route("/health", methods=["GET"])
-async def health_check() -> Dict[str, Any]:
+async def health_check(request: Request) -> JSONResponse:
     """Health check endpoint for cloud deployment monitoring."""
-    return {
+    content = {
         "status": "healthy",
         "service": "iOS Automation MCP Server (FastMCP)",
         "version": "2.0.0",
         "environment": "cloud" if IS_CLOUD else "local",
         "timestamp": datetime.now().isoformat()
     }
+    return JSONResponse(content)
+
 
 # Add root endpoint for basic info
 @mcp.custom_route("/", methods=["GET"])
-async def root() -> Dict[str, Any]:
+async def root(request: Request) -> JSONResponse:
     """Root endpoint providing basic server information."""
-    return {
+    content = {
         "name": "iOS Automation MCP Server (FastMCP)",
         "version": "2.0.0",
         "status": "running",
@@ -452,6 +455,8 @@ async def root() -> Dict[str, Any]:
         "transport": os.getenv("MCP_TRANSPORT", "sse"),
         "timestamp": datetime.now().isoformat()
     }
+    return JSONResponse(content)
+
 
 # REMOVED app.include_router(mcp.router)
 

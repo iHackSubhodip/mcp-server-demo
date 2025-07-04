@@ -1,12 +1,34 @@
-fastmcp
-starlette
-uvicorn
-gunicorn
-python-dotenv
-aiohttp
-requests
-psutil
-six
-websockets
-# Adding for the automation tools
-appium-python-client 
+# Core MCP Server Dependencies
+mcp>=1.9.0
+fastmcp>=2.7.0
+
+# HTTP Framework & Server
+fastapi>=0.115.0
+uvicorn>=0.34.0
+gunicorn>=21.2.0
+starlette>=0.37.0
+
+# HTTP client for Appium communication and other needs
+aiohttp>=3.9.0
+httpx>=0.27.0
+requests>=2.31.0
+httpx-sse>=0.4.0
+
+# iOS Automation Stack (ensure versions are compatible)
+appium-python-client>=3.2.0
+
+# System, Utility & Type-hinting
+python-dotenv>=1.0.0
+pydantic>=2.0.0
+pydantic-settings>=2.0.0
+typing_extensions
+
+# Required by starlette/fastapi
+anyio
+click
+h11
+idna
+python-multipart
+rich
+shellingham
+sniffio 
