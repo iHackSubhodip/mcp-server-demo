@@ -14,7 +14,7 @@ from typing import Optional, Dict, Any
 from datetime import datetime
 
 from fastmcp import FastMCP, Context
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from sse_starlette.sse import EventSourceResponse
 
 # Add the current directory to sys.path
@@ -462,23 +462,9 @@ async def root() -> Dict[str, Any]:
 
 # Add SSE endpoint
 @app.get("/sse")
-async def sse():
+async def sse(request: Request):
     """SSE endpoint for FastMCP communication."""
-    try:
-        async def event_generator():
-            while True:
-                if await mcp.has_message():
-                    message = await mcp.get_message()
-                    yield {
-                        "event": "message",
-                        "data": message
-                    }
-                await asyncio.sleep(0.1)
-        
-        return EventSourceResponse(event_generator())
-    except Exception as e:
-        logger.error(f"SSE endpoint error: {e}")
-        return {"error": str(e)}
+    return await mcp.handle_sse_request(request)
 
 if __name__ == "__main__":
     import uvicorn
