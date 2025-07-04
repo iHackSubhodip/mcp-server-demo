@@ -33,5 +33,5 @@ USER fastmcp
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
   CMD curl -f http://localhost:${PORT:-8000}/health || exit 1
 
-# Start command
-CMD ["python", "fastmcp_server.py"] 
+# Start command wrapped in shell to support environment variable expansion
+CMD ["/bin/sh", "-c", "exec python fastmcp_server.py"] 
