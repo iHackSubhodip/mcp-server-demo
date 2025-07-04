@@ -5,14 +5,20 @@ This module handles taking and managing screenshots from iOS simulators
 with proper error handling and file management.
 """
 
+import os
+import sys
 import asyncio
 from pathlib import Path
 from typing import Optional, Dict, Any, List
 from datetime import datetime
 
-from ..utils.command_runner import run_command
-from ..utils.logger import get_logger
-from ..utils.exceptions import ScreenshotError
+# Add the parent directory to sys.path for direct execution
+if __name__ == "__main__":
+    sys.path.insert(0, str(Path(__file__).parent.parent))
+
+from utils.command_runner import run_command
+from utils.logger import get_logger
+from utils.exceptions import ScreenshotError
 
 logger = get_logger(__name__)
 
@@ -37,7 +43,7 @@ class ScreenshotService:
         else:
             # Use project root directory instead of current working directory
             # to avoid issues when MCP server is started by Claude Desktop
-            project_root = Path(__file__).parent.parent.parent
+            project_root = Path(__file__).parent.parent
             self.default_directory = project_root / "screenshots"
         
         self.logger = get_logger(__name__)

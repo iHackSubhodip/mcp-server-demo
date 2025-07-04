@@ -15,27 +15,15 @@ from datetime import datetime
 
 from fastmcp import FastMCP, Context
 
-# Handle both direct execution and module imports
-try:
-    # Try relative imports first (when running as module)
-    from .automation.screenshot_service import ScreenshotService
-    from .automation.appium_client import AppiumClient  
-    from .automation.simulator_manager import SimulatorManager
-    from .tools.find_and_tap_tool import FindAndTapTool
-    from .config.settings import settings
-    from .utils.logger import get_logger
-except ImportError:
-    # Fall back to absolute imports (when running directly)
-    import sys
-    from pathlib import Path
-    sys.path.insert(0, str(Path(__file__).parent))
-    
-    from automation.screenshot_service import ScreenshotService
-    from automation.appium_client import AppiumClient  
-    from automation.simulator_manager import SimulatorManager
-    from tools.find_and_tap_tool import FindAndTapTool
-    from config.settings import settings
-    from utils.logger import get_logger
+# Add the current directory to sys.path
+sys.path.insert(0, str(Path(__file__).parent))
+
+from automation.screenshot_service import ScreenshotService
+from automation.appium_client import AppiumClient  
+from automation.simulator_manager import SimulatorManager
+from tools.find_and_tap_tool import FindAndTapTool
+from config.settings import settings
+from utils.logger import get_logger
 
 # Initialize logger
 logger = get_logger(__name__)

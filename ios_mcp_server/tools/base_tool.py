@@ -1,16 +1,18 @@
 """
-Base tool class for MCP tools.
-
-This module provides the abstract base class that all MCP tools inherit from,
-implementing the Template Method pattern for consistent tool behavior.
+Base tool class for iOS automation tools.
 """
 
-from abc import ABC, abstractmethod
-from typing import Dict, Any, List, Optional
+import os
+import sys
+from pathlib import Path
+from typing import Dict, Any, Optional, List
 from dataclasses import dataclass
 
-from ..utils.logger import get_logger
-from ..utils.exceptions import ToolExecutionError, ValidationError
+# Add the parent directory to sys.path
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
+from utils.logger import get_logger
+from utils.exceptions import ToolExecutionError, ValidationError
 
 
 @dataclass
@@ -49,7 +51,7 @@ class ToolArgument:
         return schema
 
 
-class BaseTool(ABC):
+class BaseTool:
     """
     Abstract base class for all MCP tools.
     
@@ -68,24 +70,20 @@ class BaseTool(ABC):
         self.logger = get_logger(self.__class__.__name__)
     
     @property
-    @abstractmethod
     def name(self) -> str:
         """Return the tool name for MCP registration."""
         pass
     
     @property
-    @abstractmethod
     def description(self) -> str:
         """Return the tool description for MCP registration."""
         pass
     
     @property
-    @abstractmethod
     def arguments(self) -> List[ToolArgument]:
         """Return the list of tool arguments."""
         pass
     
-    @abstractmethod
     async def execute_impl(self, **kwargs) -> Dict[str, Any]:
         """
         Implement the actual tool functionality.

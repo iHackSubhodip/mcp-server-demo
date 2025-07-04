@@ -1,15 +1,17 @@
 """
-Centralized logging configuration for iOS MCP Server.
-
-This module provides a consistent logging setup across all components,
-making debugging and monitoring much easier.
+Logging utilities for iOS automation.
 """
 
-import logging
+import os
 import sys
+import logging
+from pathlib import Path
 from typing import Optional
 
-from ..config.settings import settings
+# Add the parent directory to sys.path
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
+from config.settings import settings
 
 
 class ColoredFormatter(logging.Formatter):

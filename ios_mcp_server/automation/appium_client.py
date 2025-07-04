@@ -1,20 +1,26 @@
 """
-Appium client for real iOS automation.
+Appium client for iOS automation.
 
 This module provides a clean interface to Appium automation services,
 handling connection management, script generation, and execution.
 """
 
+import os
+import sys
 import asyncio
 import tempfile
 from pathlib import Path
 from typing import Dict, Any, Optional
+from datetime import datetime
+
+# Add the parent directory to sys.path
+sys.path.insert(0, str(Path(__file__).parent.parent))
 
 import aiohttp
 
-from ..config.settings import settings
-from ..utils.logger import get_logger
-from ..utils.exceptions import AppiumConnectionError, AutomationError
+from config.settings import settings
+from utils.logger import get_logger
+from utils.exceptions import AppiumConnectionError, AutomationError
 
 logger = get_logger(__name__)
 
@@ -207,7 +213,7 @@ class AppiumClient:
         escaped_text = text.replace('\\', '\\\\').replace('"', '\\"').replace("'", "\\'")
         
         # Import settings for configuration
-        from ios_mcp_server.config.settings import settings
+        from config.settings import settings
         
         # Generate the automation script with proper error handling
         script = f'''

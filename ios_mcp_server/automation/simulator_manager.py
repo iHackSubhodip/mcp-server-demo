@@ -1,16 +1,19 @@
 """
-iOS Simulator management service.
-
-This module provides operations for managing iOS simulators including
-listing, booting, and launching applications.
+iOS Simulator manager for automation.
 """
 
-from typing import List, Dict, Any, Optional
+import os
+import sys
 import json
+from pathlib import Path
+from typing import Dict, Any, Optional, List
 
-from ..utils.command_runner import run_command
-from ..utils.logger import get_logger
-from ..utils.exceptions import SimulatorError, AppLaunchError
+# Add the parent directory to sys.path
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
+from utils.command_runner import run_command
+from utils.logger import get_logger
+from utils.exceptions import SimulatorError, AppLaunchError
 
 logger = get_logger(__name__)
 

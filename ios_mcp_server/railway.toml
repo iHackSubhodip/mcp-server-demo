@@ -1,0 +1,21 @@
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "Dockerfile"
+
+[deploy]
+startCommand = "python fastmcp_server.py"
+healthcheckPath = "/health"
+healthcheckTimeout = 10
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 3
+
+# Health check configuration
+healthcheck = { interval = "30s", timeout = "10s", retries = 3 }
+
+# Resource optimization
+sleepMode = "never"  # Server needs to be always available
+
+# Usage limits to prevent runaway costs
+[deploy.resource_limits]
+memory = "1024MB"  # 1GB should be enough for our server
+cpu = "1.0"        # Full CPU core 

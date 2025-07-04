@@ -1,5 +1,5 @@
 """
-Find and Tap Tool for iOS automation.
+Find and tap tool for iOS automation.
 
 This module provides a comprehensive tool for finding and tapping any UI element
 on iOS screens using multiple finding strategies. Built following SOLID principles
@@ -8,31 +8,19 @@ with production-level error handling and logging.
 
 import asyncio
 import tempfile
+import os
+import sys
 from pathlib import Path
 from typing import Dict, Any, List, Optional, Union
 
-try:
-    from .base_tool import BaseTool, ToolArgument
-    from ..automation.appium_client import AppiumClient
-    from ..config.settings import settings
-    from ..utils.logger import get_logger
-    from ..utils.exceptions import AutomationError, ValidationError
-except ImportError:
-    # Fallback for Claude Desktop context
-    import sys
-    import os
-    
-    # Add the ios_mcp_server to path if not already there
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    parent_dir = os.path.dirname(current_dir)
-    if parent_dir not in sys.path:
-        sys.path.insert(0, parent_dir)
-    
-    from tools.base_tool import BaseTool, ToolArgument
-    from automation.appium_client import AppiumClient
-    from config.settings import settings
-    from utils.logger import get_logger
-    from utils.exceptions import AutomationError, ValidationError
+# Add the parent directory to sys.path
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
+from tools.base_tool import BaseTool, ToolArgument
+from automation.appium_client import AppiumClient
+from config.settings import settings
+from utils.logger import get_logger
+from utils.exceptions import AutomationError, ValidationError
 
 
 class FindAndTapTool(BaseTool):
