@@ -32,40 +32,15 @@ from utils.logger import get_logger
 # Initialize logger
 logger = get_logger(__name__)
 
-# 1. Create the FastMCP server instance
+# 1. Initialize the FastMCP server instance
 mcp = FastMCP(
     name=f"{settings.server.name} (FastMCP)",
     version="2.0.0"
 )
 
-# 2. Define the middleware stack
-cors_middleware = [
-    Middleware(
-        CORSMiddleware,
-        allow_origins=["*"],
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )
-]
-
-# 3. Create the final ASGI app, passing the middleware
-# We will run this `app` object with gunicorn
-app = mcp.http_app(transport="sse", middleware=cors_middleware)
-
-
-# Initialize services only if not in cloud environment
-IS_CLOUD = bool(os.getenv("RAILWAY_ENVIRONMENT") or os.getenv("HEROKU_APP_NAME") or os.getenv("GOOGLE_CLOUD_PROJECT"))
-
-if not IS_CLOUD:
-    # Initialize local services
-    screenshot_service = ScreenshotService()
-    appium_client = AppiumClient()
-    simulator_manager = SimulatorManager()
-    find_and_tap_tool = FindAndTapTool()
-    logger.info(f"🚀 FastMCP Server initialized with local services")
-else:
-    logger.info(f"☁️ FastMCP Server running in cloud mode - local services disabled")
+# 2. Define all tool and route functions.
+# The @mcp.tool and @mcp.custom_route decorators will register them
+# with the global 'mcp' instance.
 
 @mcp.tool
 async def take_screenshot(
@@ -478,50 +453,73 @@ async def root(request: Request) -> JSONResponse:
     return JSONResponse(content)
 
 
-# The __main__ block is no longer needed for gunicorn deployment,
-# but we can keep it for local testing. The 'uvicorn.run' will now
-# target our new 'app' object.
-def main():
-    """Main entry point for FastMCP server."""
-    
-    # Get transport configuration - prioritize environment for cloud deployment
-    transport = os.getenv("MCP_TRANSPORT", "sse").lower()
-    host = os.getenv("MCP_HOST", "0.0.0.0")
-    # Ensure port is read from Railway's PORT env var
-    port_str = os.getenv("PORT", os.getenv("MCP_PORT", "8000"))
-    try:
-        port = int(port_str)
-    except (ValueError, TypeError):
-        logger.warning(f"Invalid PORT value received: '{port_str}'. Defaulting to 8000.")
-        port = 8000
-    
-    logger.info(f"🎯 iOS Automation Server (FastMCP 2.0)")
-    logger.info(f"🐍 Python: {sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}")
-    logger.info(f"⚡ FastMCP: 2.9.2")
-    logger.info(f"🔌 Transport: {transport}")
-    
-    if IS_CLOUD:
-        logger.info("☁️  Cloud deployment detected - using SSE transport")
-        transport = "sse"
-        logger.info("🌍 Remote deployment - accessible globally via SSE")
-        logger.info("🔍 Health check available at /health")
-        logger.info(f"📡 SSE endpoint: /sse")
-    else:
-        logger.info("🔧 Local development mode")
-        logger.info("🔧 Available tools: take_screenshot, launch_app, find_and_tap, appium_tap_and_type, list_simulators")
-    
-    # Run the server
-    try:
-        import uvicorn
-        host = os.getenv("MCP_HOST", "127.0.0.1") # Use 127.0.0.1 for local
-        port = 8000
-        logger.info(f"🚀 Starting local development server on http://{host}:{port}")
-        uvicorn.run(app, host=host, port=port, log_level="debug")
-    except KeyboardInterrupt:
-        logger.info("\n⏹️ FastMCP server stopped by user")
-    except Exception as e:
-        logger.error(f"💥 FastMCP server error: {e}")
-        sys.exit(1)
+# 3. Define the middleware stack
+cors_middleware = [
+    Middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+]
 
+# 4. Create the final, runnable ASGI app
+app = mcp.http_app(transport="sse", middleware=cors_middleware)
+
+# 5. Initialize services (MUST be after app creation and decorator definitions)
+IS_CLOUD = bool(os.getenv("RAILWAY_ENVIRONMENT") or os.getenv("HEROKU_APP_NAME") or os.getenv("GOOGLE_CLOUD_PROJECT"))
+
+if not IS_CLOUD:
+    # Initialize local services
+    screenshot_service = ScreenshotService()
+    appium_client = AppiumClient()
+    simulator_manager = SimulatorManager()
+    find_and_tap_tool = FindAndTapTool()
+    logger.info(f"🚀 FastMCP Server initialized with local services")
+else:
+    logger.info(f"☁️ FastMCP Server running in cloud mode - local services disabled")
+
+
+# __main__ block for local execution
 if __name__ == "__main__":
+    def main():
+        # Get transport configuration - prioritize environment for cloud deployment
+        transport = os.getenv("MCP_TRANSPORT", "sse").lower()
+        host = os.getenv("MCP_HOST", "0.0.0.0")
+        # Ensure port is read from Railway's PORT env var
+        port_str = os.getenv("PORT", os.getenv("MCP_PORT", "8000"))
+        try:
+            port = int(port_str)
+        except (ValueError, TypeError):
+            logger.warning(f"Invalid PORT value received: '{port_str}'. Defaulting to 8000.")
+            port = 8000
+        
+        logger.info(f"🎯 iOS Automation Server (FastMCP 2.0)")
+        logger.info(f"🐍 Python: {sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}")
+        logger.info(f"⚡ FastMCP: 2.9.2")
+        logger.info(f"🔌 Transport: {transport}")
+        
+        if IS_CLOUD:
+            logger.info("☁️  Cloud deployment detected - using SSE transport")
+            transport = "sse"
+            logger.info("🌍 Remote deployment - accessible globally via SSE")
+            logger.info("🔍 Health check available at /health")
+            logger.info(f"📡 SSE endpoint: /sse")
+        else:
+            logger.info("🔧 Local development mode")
+            logger.info("🔧 Available tools: take_screenshot, launch_app, find_and_tap, appium_tap_and_type, list_simulators")
+        
+        # Run the server
+        try:
+            import uvicorn
+            host = os.getenv("MCP_HOST", "127.0.0.1") # Use 127.0.0.1 for local
+            port = 8000
+            logger.info(f"🚀 Starting local development server on http://{host}:{port}")
+            uvicorn.run(app, host=host, port=port, log_level="debug")
+        except KeyboardInterrupt:
+            logger.info("\n⏹️ FastMCP server stopped by user")
+        except Exception as e:
+            logger.error(f"💥 FastMCP server error: {e}")
+            sys.exit(1)
     main() 
