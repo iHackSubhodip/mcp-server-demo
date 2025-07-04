@@ -14,8 +14,7 @@ from typing import Optional, Dict, Any
 from datetime import datetime
 
 from fastmcp import FastMCP, Context
-from fastapi import FastAPI, Request
-from sse_starlette.sse import EventSourceResponse
+# REMOVED fastapi imports
 
 # Add the current directory to sys.path
 sys.path.insert(0, str(Path(__file__).parent))
@@ -30,18 +29,12 @@ from utils.logger import get_logger
 # Initialize logger
 logger = get_logger(__name__)
 
-# Create FastAPI app
-app = FastAPI(
-    title="iOS Automation MCP Server",
-    description="FastMCP server for iOS automation",
-    version="2.0.0"
-)
-
-# Initialize FastMCP server with proper naming
+# Initialize FastMCP server - THIS IS OUR APP
 mcp = FastMCP(
     name=f"{settings.server.name} (FastMCP)",
     version="2.0.0"
 )
+# REMOVED app = FastAPI()
 
 # Initialize services only if not in cloud environment
 IS_CLOUD = bool(os.getenv("RAILWAY_ENVIRONMENT") or os.getenv("HEROKU_APP_NAME") or os.getenv("GOOGLE_CLOUD_PROJECT"))
@@ -436,8 +429,8 @@ async def get_server_status(ctx: Optional[Context] = None) -> Dict[str, Any]:
         }
 
 # Add health check endpoint for cloud deployment
-@app.get("/health")
-async def health_check() -> Dict[str, Any]:
+@mcp.custom_route("/health", methods=["GET"])
+async def health_check(request) -> Dict[str, Any]:
     """Health check endpoint for cloud deployment monitoring."""
     return {
         "status": "healthy",
@@ -448,7 +441,7 @@ async def health_check() -> Dict[str, Any]:
     }
 
 # Add root endpoint for basic info
-@app.get("/")
+@mcp.custom_route("/", methods=["GET"])
 async def root() -> Dict[str, Any]:
     """Root endpoint providing basic server information."""
     return {
@@ -460,15 +453,14 @@ async def root() -> Dict[str, Any]:
         "timestamp": datetime.now().isoformat()
     }
 
-# Include the FastMCP router, which handles SSE and tool calls
-app.include_router(mcp.router)
+# REMOVED app.include_router(mcp.router)
 
-if __name__ == "__main__":
-    import uvicorn
+def main():
+    """Main entry point for FastMCP server."""
     
     # Get transport configuration - prioritize environment for cloud deployment
     transport = os.getenv("MCP_TRANSPORT", "sse").lower()
-    host = os.getenv("MCP_HOST", "0.0.0.0")  # Changed to 0.0.0.0 for cloud deployment
+    host = os.getenv("MCP_HOST", "0.0.0.0")
     port_str = os.getenv("MCP_PORT", os.getenv("PORT", "8000"))
     try:
         port = int(port_str)
@@ -491,11 +483,14 @@ if __name__ == "__main__":
         logger.info("🔧 Local development mode")
         logger.info("🔧 Available tools: take_screenshot, launch_app, find_and_tap, appium_tap_and_type, list_simulators")
     
-    # Run the server
+    # Run the FastMCP server
     try:
-        uvicorn.run(app, host=host, port=port, log_level="debug")
+        mcp.run(transport=transport, host=host, port=port)
     except KeyboardInterrupt:
         logger.info("\n⏹️ FastMCP server stopped by user")
     except Exception as e:
         logger.error(f"💥 FastMCP server error: {e}")
-        sys.exit(1) 
+        sys.exit(1)
+
+if __name__ == "__main__":
+    main() 
