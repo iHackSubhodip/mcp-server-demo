@@ -1,50 +1,37 @@
-# Use Python 3.11 slim image for better performance
+# Use Python 3.11 slim image
 FROM python:3.11-slim
 
-# Set working directory
 WORKDIR /app
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONPATH=/app \
     MCP_TRANSPORT=sse \
     MCP_HOST=0.0.0.0
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
+# Install dependencies
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
     build-essential \
-    curl \
-    && rm -rf /var/lib/apt/lists/* \
-    && apt-get clean
+    curl && \
+    rm -rf /var/lib/apt/lists/*
 
-# Create and activate virtual environment
-RUN python -m venv /opt/venv
-ENV PATH="/opt/venv/bin:$PATH"
-
-# Copy requirements file
+# Copy requirements and install dependencies
 COPY requirements.txt .
-
-# Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the application code
+# Copy application code
 COPY . .
-
-# Install the package in development mode
 RUN pip install -e .
 
 # Create non-root user
-RUN useradd -m -u 1000 fastmcp
+RUN useradd -m -u 1000 fastmcp && \
+    chown -R fastmcp:fastmcp /app
 USER fastmcp
-
-# Expose port (Railway will override this with $PORT)
-EXPOSE 8000
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
   CMD curl -f http://localhost:${PORT:-8000}/health || exit 1
 
-# Run the FastMCP server (Railway will provide $PORT)
-ENTRYPOINT ["python"]
-CMD ["fastmcp_server.py"] 
+# Start command
+CMD ["python", "fastmcp_server.py"] 
