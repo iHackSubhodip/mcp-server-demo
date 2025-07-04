@@ -1,6 +1,7 @@
 [build]
 builder = "DOCKERFILE"
 dockerfilePath = "Dockerfile"
+buildCommand = ""  # Explicitly disable Railpack build command
 
 [deploy]
 healthcheckPath = "/health"

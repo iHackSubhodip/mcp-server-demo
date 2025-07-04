@@ -9,8 +9,7 @@ ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     PYTHONPATH=/app \
     MCP_TRANSPORT=sse \
-    MCP_HOST=0.0.0.0 \
-    PORT=8000
+    MCP_HOST=0.0.0.0
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
@@ -39,12 +38,13 @@ RUN pip install -e .
 RUN useradd -m -u 1000 fastmcp
 USER fastmcp
 
-# Expose port
+# Expose port (Railway will override this with $PORT)
 EXPOSE 8000
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-  CMD curl -f http://localhost:8000/health || exit 1
+  CMD curl -f http://localhost:${PORT:-8000}/health || exit 1
 
-# Run the FastMCP server
-CMD ["python", "fastmcp_server.py"] 
+# Run the FastMCP server (Railway will provide $PORT)
+ENTRYPOINT ["python"]
+CMD ["fastmcp_server.py"] 
