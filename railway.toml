@@ -1,6 +1,6 @@
 [build]
 builder = "DOCKERFILE"
-dockerfilePath = "Dockerfile"
+dockerfilePath = "ios_mcp_server/Dockerfile"
 
 [deploy]
 healthcheckPath = "/health"
