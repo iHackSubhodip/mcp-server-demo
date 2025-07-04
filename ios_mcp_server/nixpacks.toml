@@ -1,8 +1,8 @@
 [phases.setup]
-nixPkgs = ["python311"]
+nixPkgs = ["python3"]
 
 [phases.install]
-cmds = ["python -m pip install --upgrade pip", "pip install -r requirements.txt", "pip install -e ."]
+cmds = ["python -m pip install --upgrade pip", "pip install -r requirements.txt"]
 
 [start]
 cmd = "python fastmcp_server.py" 
