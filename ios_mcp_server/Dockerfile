@@ -20,12 +20,12 @@ RUN apt-get update && \
 # Debug: List what's available in build context
 RUN echo "=== Build context contents ===" && ls -la
 
-# Copy the ios_mcp_server directory requirements
-COPY ios_mcp_server/requirements.txt .
+# Copy requirements and install dependencies
+COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy application code from ios_mcp_server subdirectory
-COPY ios_mcp_server/ .
+# Copy application code (current directory is already ios_mcp_server)
+COPY . .
 RUN pip install -e .
 
 # Create non-root user
