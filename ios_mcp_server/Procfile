@@ -1,1 +1,1 @@
-web: cd /app && gunicorn fastmcp_server:app -w 1 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:$PORT --log-level debug --timeout 120 
+web: gunicorn ios_mcp_server.fastmcp_server:app -w 1 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:$PORT --log-level debug --timeout 120 
