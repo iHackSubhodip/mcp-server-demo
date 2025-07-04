@@ -2,6 +2,11 @@
 mcp>=1.0.0
 fastmcp>=2.9.2
 
+# HTTP Framework & Server
+fastapi>=0.109.0
+uvicorn>=0.27.0
+gunicorn>=21.2.0
+
 # HTTP client for Appium communication
 aiohttp>=3.9.0
 httpx>=0.25.0

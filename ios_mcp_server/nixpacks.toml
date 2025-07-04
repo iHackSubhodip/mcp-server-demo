@@ -5,4 +5,4 @@ nixPkgs = ["python3"]
 cmds = ["python -m pip install --upgrade pip", "pip install -r requirements.txt"]
 
 [start]
-cmd = "python fastmcp_server.py" 
+cmd = "gunicorn fastmcp_server:app -w 1 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:$PORT --log-level debug --timeout 120" 

@@ -14,6 +14,8 @@ from typing import Optional, Dict, Any
 from datetime import datetime
 
 from fastmcp import FastMCP, Context
+from fastapi import FastAPI
+from sse_starlette.sse import EventSourceResponse
 
 # Add the current directory to sys.path
 sys.path.insert(0, str(Path(__file__).parent))
@@ -28,19 +30,31 @@ from utils.logger import get_logger
 # Initialize logger
 logger = get_logger(__name__)
 
+# Create FastAPI app
+app = FastAPI(
+    title="iOS Automation MCP Server",
+    description="FastMCP server for iOS automation",
+    version="2.0.0"
+)
+
 # Initialize FastMCP server with proper naming
 mcp = FastMCP(
     name=f"{settings.server.name} (FastMCP)",
     version="2.0.0"
 )
 
-# Initialize services (reuse existing robust implementations)
-screenshot_service = ScreenshotService()
-appium_client = AppiumClient()
-simulator_manager = SimulatorManager()
-find_and_tap_tool = FindAndTapTool()
+# Initialize services only if not in cloud environment
+IS_CLOUD = bool(os.getenv("RAILWAY_ENVIRONMENT") or os.getenv("HEROKU_APP_NAME") or os.getenv("GOOGLE_CLOUD_PROJECT"))
 
-logger.info(f"🚀 FastMCP Server initialized with existing services")
+if not IS_CLOUD:
+    # Initialize local services
+    screenshot_service = ScreenshotService()
+    appium_client = AppiumClient()
+    simulator_manager = SimulatorManager()
+    find_and_tap_tool = FindAndTapTool()
+    logger.info(f"🚀 FastMCP Server initialized with local services")
+else:
+    logger.info(f"☁️ FastMCP Server running in cloud mode - local services disabled")
 
 @mcp.tool
 async def take_screenshot(
@@ -422,21 +436,55 @@ async def get_server_status(ctx: Optional[Context] = None) -> Dict[str, Any]:
         }
 
 # Add health check endpoint for cloud deployment
-@mcp.custom_route("/health", methods=["GET"])
-async def health_check(request) -> Dict[str, Any]:
+@app.get("/health")
+async def health_check() -> Dict[str, Any]:
     """Health check endpoint for cloud deployment monitoring."""
     return {
         "status": "healthy",
         "service": "iOS Automation MCP Server (FastMCP)",
         "version": "2.0.0",
+        "environment": "cloud" if IS_CLOUD else "local",
         "timestamp": datetime.now().isoformat()
     }
 
-def main():
-    """Main entry point for FastMCP server."""
+# Add root endpoint for basic info
+@app.get("/")
+async def root() -> Dict[str, Any]:
+    """Root endpoint providing basic server information."""
+    return {
+        "name": "iOS Automation MCP Server (FastMCP)",
+        "version": "2.0.0",
+        "status": "running",
+        "environment": "cloud" if IS_CLOUD else "local",
+        "transport": os.getenv("MCP_TRANSPORT", "sse"),
+        "timestamp": datetime.now().isoformat()
+    }
+
+# Add SSE endpoint
+@app.get("/sse")
+async def sse():
+    """SSE endpoint for FastMCP communication."""
+    try:
+        async def event_generator():
+            while True:
+                if await mcp.has_message():
+                    message = await mcp.get_message()
+                    yield {
+                        "event": "message",
+                        "data": message
+                    }
+                await asyncio.sleep(0.1)
+        
+        return EventSourceResponse(event_generator())
+    except Exception as e:
+        logger.error(f"SSE endpoint error: {e}")
+        return {"error": str(e)}
+
+if __name__ == "__main__":
+    import uvicorn
     
     # Get transport configuration - prioritize environment for cloud deployment
-    transport = os.getenv("MCP_TRANSPORT", "stdio").lower()
+    transport = os.getenv("MCP_TRANSPORT", "sse").lower()
     host = os.getenv("MCP_HOST", "0.0.0.0")  # Changed to 0.0.0.0 for cloud deployment
     port = int(os.getenv("MCP_PORT", os.getenv("PORT", "8000")))  # Railway uses PORT env var
     
@@ -444,41 +492,22 @@ def main():
     logger.info(f"🐍 Python: {sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}")
     logger.info(f"⚡ FastMCP: 2.9.2")
     logger.info(f"🔌 Transport: {transport}")
-    logger.info(f"🔧 Reusing existing services: screenshot, appium, simulator")
     
-    # Auto-detect deployment environment
-    if os.getenv("RAILWAY_ENVIRONMENT") or os.getenv("HEROKU_APP_NAME") or os.getenv("GOOGLE_CLOUD_PROJECT"):
+    if IS_CLOUD:
         logger.info("☁️  Cloud deployment detected - using SSE transport")
         transport = "sse"
-    
-    if transport == "stdio":
-        logger.info("📱 Claude Desktop mode - FastMCP server ready!")
-        logger.info("🔧 Available tools: take_screenshot, launch_app, find_and_tap, appium_tap_and_type, list_simulators, get_server_status")
-    elif transport == "sse":
-        logger.info(f"🌐 SSE server mode on {host}:{port}")
         logger.info("🌍 Remote deployment - accessible globally via SSE")
         logger.info("🔍 Health check available at /health")
-        logger.info(f"📡 SSE endpoint: https://your-app.railway.app/sse")
-        logger.info(f"💬 Messages endpoint: https://your-app.railway.app/messages")
+        logger.info(f"📡 SSE endpoint: /sse")
     else:
-        logger.info(f"🌐 HTTP server mode on {host}:{port}")
-        logger.info("🌍 Remote deployment - accessible globally via HTTP")
-        logger.info("🔍 Health check available at /health")
+        logger.info("🔧 Local development mode")
+        logger.info("🔧 Available tools: take_screenshot, launch_app, find_and_tap, appium_tap_and_type, list_simulators")
     
-    # Run the FastMCP server
+    # Run the server
     try:
-        if transport == "sse":
-            mcp.run(transport="sse", host=host, port=port)
-        elif transport == "http":
-            mcp.run(transport="http", host=host, port=port)
-        else:
-            # Default to stdio for Claude Desktop
-            mcp.run()
+        uvicorn.run(app, host=host, port=port, log_level="debug")
     except KeyboardInterrupt:
         logger.info("\n⏹️ FastMCP server stopped by user")
     except Exception as e:
         logger.error(f"💥 FastMCP server error: {e}")
-        sys.exit(1)
-
-if __name__ == "__main__":
-    main() 
+        sys.exit(1) 
