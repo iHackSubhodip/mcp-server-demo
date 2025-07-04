@@ -7,7 +7,8 @@ WORKDIR /app
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     MCP_TRANSPORT=sse \
-    MCP_HOST=0.0.0.0
+    MCP_HOST=0.0.0.0 \
+    PYTHONPATH=/app
 
 # Install dependencies
 RUN apt-get update && \
@@ -16,12 +17,15 @@ RUN apt-get update && \
     curl && \
     rm -rf /var/lib/apt/lists/*
 
-# Copy requirements and install dependencies
-COPY requirements.txt .
+# Debug: List what's available in build context
+RUN echo "=== Build context contents ===" && ls -la
+
+# Copy the ios_mcp_server directory requirements
+COPY ios_mcp_server/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy application code
-COPY . .
+# Copy application code from ios_mcp_server subdirectory
+COPY ios_mcp_server/ .
 RUN pip install -e .
 
 # Create non-root user
@@ -33,5 +37,5 @@ USER fastmcp
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
   CMD curl -f http://localhost:${PORT:-8000}/health || exit 1
 
-# Start command wrapped in shell to support environment variable expansion
-CMD ["/bin/sh", "-c", "exec python fastmcp_server.py"] 
+# Start command - Railway will provide PORT env var
+CMD ["python", "fastmcp_server.py"] 
