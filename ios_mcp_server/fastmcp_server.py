@@ -588,27 +588,144 @@ else:
             return True
             
         async def tap_and_type(self, text, timeout=10):
-            # Simulate typing
-            logger.info(f"Remote typing: {text}")
-            return {"success": True, "text": text}
+            try:
+                # Actually type text via remote Appium server
+                import aiohttp
+                from datetime import datetime
+                
+                # Use HTTPS for ngrok tunnels, HTTP for direct connections
+                protocol = "https" if "ngrok" in self.remote_host else "http"
+                port_suffix = "" if "ngrok" in self.remote_host else f":{self.remote_port}"
+                remote_url = f"{protocol}://{self.remote_host}{port_suffix}"
+                
+                async with aiohttp.ClientSession() as session:
+                    # Create a session (W3C format)
+                    session_payload = {
+                        "capabilities": {
+                            "alwaysMatch": {
+                                "platformName": "iOS",
+                                "appium:deviceName": "iPhone 16 Pro",
+                                "appium:automationName": "XCUITest",
+                                "appium:udid": "4013533D-4166-4991-B3AD-5E4660AC2DD1"
+                            }
+                        }
+                    }
+                    
+                    async with session.post(f"{remote_url}/session", json=session_payload) as resp:
+                        if resp.status == 200:
+                            session_data = await resp.json()
+                            session_id = session_data["value"]["sessionId"]
+                            
+                            try:
+                                # Find active text field
+                                find_payload = {
+                                    "using": "xpath",
+                                    "value": "//XCUIElementTypeTextField | //XCUIElementTypeTextView"
+                                }
+                                
+                                async with session.post(f"{remote_url}/session/{session_id}/element", json=find_payload) as find_resp:
+                                    if find_resp.status == 200:
+                                        find_data = await find_resp.json()
+                                        element_id = find_data["value"]["ELEMENT"] if "ELEMENT" in find_data["value"] else find_data["value"]["element-6066-11e4-a52e-4f735466cecf"]
+                                        
+                                        # Clear existing text and type new text
+                                        await session.post(f"{remote_url}/session/{session_id}/element/{element_id}/clear")
+                                        
+                                        type_payload = {"text": text}
+                                        async with session.post(f"{remote_url}/session/{session_id}/element/{element_id}/value", json=type_payload) as type_resp:
+                                            if type_resp.status == 200:
+                                                logger.info(f"✅ Remote text input successful: {text[:50]}{'...' if len(text) > 50 else ''}")
+                                                return {
+                                                    "success": True,
+                                                    "text": text,
+                                                    "session_id": session_id,
+                                                    "timestamp": datetime.now().isoformat()
+                                                }
+                                            else:
+                                                error_text = await type_resp.text()
+                                                raise Exception(f"Text input failed: {type_resp.status} - {error_text}")
+                                    else:
+                                        error_text = await find_resp.text()
+                                        raise Exception(f"Text field not found: {find_resp.status} - {error_text}")
+                                        
+                            finally:
+                                # Clean up session
+                                await session.delete(f"{remote_url}/session/{session_id}")
+                        else:
+                            error_text = await resp.text()
+                            raise Exception(f"Session creation failed: {resp.status} - {error_text}")
+                
+            except Exception as e:
+                logger.error(f"❌ Remote text input error: {e}")
+                # Don't simulate on error - let the error propagate
+                raise Exception(f"Failed to type text remotely: {str(e)}")
     
     class RemoteSimulatorManager:
         """Remote simulator manager for cloud deployment"""
         def __init__(self):
             self.remote_host = os.getenv("REMOTE_IOS_HOST", "localhost")
+            self.remote_port = os.getenv("REMOTE_IOS_PORT", "4723")
             
         async def launch_app(self, bundle_id, device_id="booted"):
-            # Simulate app launch
-            logger.info(f"Remote app launch: {bundle_id} on {device_id}")
-            return {"success": True, "bundle_id": bundle_id, "device_id": device_id}
+            try:
+                # Actually launch the app via remote Appium server
+                import aiohttp
+                from datetime import datetime
+                
+                # Use HTTPS for ngrok tunnels, HTTP for direct connections
+                protocol = "https" if "ngrok" in self.remote_host else "http"
+                port_suffix = "" if "ngrok" in self.remote_host else f":{self.remote_port}"
+                remote_url = f"{protocol}://{self.remote_host}{port_suffix}"
+                
+                async with aiohttp.ClientSession() as session:
+                    # Create a session (W3C format) 
+                    session_payload = {
+                        "capabilities": {
+                            "alwaysMatch": {
+                                "platformName": "iOS",
+                                "appium:deviceName": "iPhone 16 Pro",
+                                "appium:automationName": "XCUITest",
+                                "appium:udid": "4013533D-4166-4991-B3AD-5E4660AC2DD1",
+                                "appium:bundleId": bundle_id,
+                                "appium:autoLaunch": True
+                            }
+                        }
+                    }
+                    
+                    async with session.post(f"{remote_url}/session", json=session_payload) as resp:
+                        if resp.status == 200:
+                            session_data = await resp.json()
+                            session_id = session_data["value"]["sessionId"]
+                            logger.info(f"✅ Remote app launch successful: {bundle_id} (session: {session_id})")
+                            
+                            # Keep session active for a moment then close it
+                            await asyncio.sleep(1)
+                            await session.delete(f"{remote_url}/session/{session_id}")
+                            
+                            return {
+                                "success": True, 
+                                "bundle_id": bundle_id, 
+                                "device_id": device_id,
+                                "session_id": session_id,
+                                "timestamp": datetime.now().isoformat()
+                            }
+                        else:
+                            error_text = await resp.text()
+                            logger.error(f"❌ Remote app launch failed: {resp.status} - {error_text}")
+                            raise Exception(f"Appium session creation failed: {resp.status} - {error_text}")
+                
+            except Exception as e:
+                logger.error(f"❌ Remote app launch error: {e}")
+                # Don't simulate on error - let the error propagate
+                raise Exception(f"Failed to launch app {bundle_id} remotely: {str(e)}")
             
         async def list_simulators(self):
             # Return simulated device list
             return {
                 "devices": [
                     {
-                        "name": "iPhone 15 Pro",
-                        "udid": "remote-device-001",
+                        "name": "iPhone 16 Pro",
+                        "udid": "4013533D-4166-4991-B3AD-5E4660AC2DD1",
                         "state": "Booted",
                         "type": "Remote iOS Device"
                     }
@@ -619,12 +736,83 @@ else:
         """Remote find and tap tool for cloud deployment"""
         def __init__(self):
             self.remote_host = os.getenv("REMOTE_IOS_HOST", "localhost")
+            self.remote_port = os.getenv("REMOTE_IOS_PORT", "4723")
             
         async def execute_impl(self, accessibility_id=None, element_text=None, device_id="booted"):
-            # Simulate find and tap
-            identifier = accessibility_id or element_text
-            logger.info(f"Remote find and tap: {identifier}")
-            return {"success": True, "element": identifier}
+            try:
+                # Actually find and tap element via remote Appium server
+                import aiohttp
+                from datetime import datetime
+                
+                # Use HTTPS for ngrok tunnels, HTTP for direct connections
+                protocol = "https" if "ngrok" in self.remote_host else "http"
+                port_suffix = "" if "ngrok" in self.remote_host else f":{self.remote_port}"
+                remote_url = f"{protocol}://{self.remote_host}{port_suffix}"
+                
+                async with aiohttp.ClientSession() as session:
+                    # Create a session (W3C format)
+                    session_payload = {
+                        "capabilities": {
+                            "alwaysMatch": {
+                                "platformName": "iOS",
+                                "appium:deviceName": "iPhone 16 Pro",
+                                "appium:automationName": "XCUITest",
+                                "appium:udid": "4013533D-4166-4991-B3AD-5E4660AC2DD1"
+                            }
+                        }
+                    }
+                    
+                    async with session.post(f"{remote_url}/session", json=session_payload) as resp:
+                        if resp.status == 200:
+                            session_data = await resp.json()
+                            session_id = session_data["value"]["sessionId"]
+                            
+                            try:
+                                # Find element by accessibility ID or text
+                                if accessibility_id:
+                                    find_payload = {
+                                        "using": "accessibility id",
+                                        "value": accessibility_id
+                                    }
+                                else:
+                                    find_payload = {
+                                        "using": "xpath",
+                                        "value": f"//*[@name='{element_text}' or @label='{element_text}']"
+                                    }
+                                
+                                async with session.post(f"{remote_url}/session/{session_id}/element", json=find_payload) as find_resp:
+                                    if find_resp.status == 200:
+                                        find_data = await find_resp.json()
+                                        element_id = find_data["value"]["ELEMENT"] if "ELEMENT" in find_data["value"] else find_data["value"]["element-6066-11e4-a52e-4f735466cecf"]
+                                        
+                                        # Tap the element
+                                        async with session.post(f"{remote_url}/session/{session_id}/element/{element_id}/click") as tap_resp:
+                                            if tap_resp.status == 200:
+                                                logger.info(f"✅ Remote find and tap successful: {accessibility_id or element_text}")
+                                                return {
+                                                    "success": True,
+                                                    "element": accessibility_id or element_text,
+                                                    "session_id": session_id,
+                                                    "timestamp": datetime.now().isoformat()
+                                                }
+                                            else:
+                                                error_text = await tap_resp.text()
+                                                raise Exception(f"Tap failed: {tap_resp.status} - {error_text}")
+                                    else:
+                                        error_text = await find_resp.text()
+                                        raise Exception(f"Element not found: {find_resp.status} - {error_text}")
+                                        
+                            finally:
+                                # Clean up session
+                                await session.delete(f"{remote_url}/session/{session_id}")
+                        else:
+                            error_text = await resp.text()
+                            raise Exception(f"Session creation failed: {resp.status} - {error_text}")
+                
+            except Exception as e:
+                logger.error(f"❌ Remote find and tap error: {e}")
+                # Don't simulate on error - let the error propagate
+                raise Exception(f"Failed to find and tap element remotely: {str(e)}")
     
     # Initialize remote services
     screenshot_service = RemoteScreenshotService()
