@@ -191,3 +191,6 @@ dmypy.json
 
 # pytype static type analyzer
 .pytype/
+
+# Current configuration with sensitive data
+CURRENT_CONFIG.md
