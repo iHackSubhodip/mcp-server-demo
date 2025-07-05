@@ -617,10 +617,10 @@ else:
                             session_id = session_data["value"]["sessionId"]
                             
                             try:
-                                # Find active text field
+                                # Find active text field using the known accessibility ID
                                 find_payload = {
-                                    "using": "xpath",
-                                    "value": "//XCUIElementTypeTextField | //XCUIElementTypeTextView"
+                                    "using": "accessibility id",
+                                    "value": "chatInputField"
                                 }
                                 
                                 async with session.post(f"{remote_url}/session/{session_id}/element", json=find_payload) as find_resp:
@@ -769,38 +769,66 @@ else:
                             
                             try:
                                 # Find element by accessibility ID or text
+                                element_found = False
+                                element_id = None
+                                
                                 if accessibility_id:
                                     find_payload = {
                                         "using": "accessibility id",
                                         "value": accessibility_id
                                     }
+                                    async with session.post(f"{remote_url}/session/{session_id}/element", json=find_payload) as find_resp:
+                                        if find_resp.status == 200:
+                                            find_data = await find_resp.json()
+                                            element_id = find_data["value"]["ELEMENT"] if "ELEMENT" in find_data["value"] else find_data["value"]["element-6066-11e4-a52e-4f735466cecf"]
+                                            element_found = True
+                                        else:
+                                            error_text = await find_resp.text()
+                                            raise Exception(f"Element not found by accessibility_id: {find_resp.status} - {error_text}")
+                                            
+                                elif element_text:
+                                    # Try multiple strategies to find elements
+                                    find_strategies = [
+                                        # First try accessibility ID (most reliable)
+                                        {"using": "accessibility id", "value": element_text},
+                                        # Then try by name attribute
+                                        {"using": "name", "value": element_text},
+                                        # Then try by partial text match
+                                        {"using": "xpath", "value": f"//*[contains(@name, '{element_text}') or contains(@label, '{element_text}')]"},
+                                        # Finally try by button text
+                                        {"using": "xpath", "value": f"//XCUIElementTypeButton[contains(@name, '{element_text}')]"}
+                                    ]
+                                    
+                                    for strategy in find_strategies:
+                                        find_payload = strategy
+                                        async with session.post(f"{remote_url}/session/{session_id}/element", json=find_payload) as find_resp:
+                                            if find_resp.status == 200:
+                                                find_data = await find_resp.json()
+                                                element_id = find_data["value"]["ELEMENT"] if "ELEMENT" in find_data["value"] else find_data["value"]["element-6066-11e4-a52e-4f735466cecf"]
+                                                element_found = True
+                                                break
+                                    
+                                    if not element_found:
+                                        raise Exception(f"Element not found with any strategy: {element_text}")
                                 else:
-                                    find_payload = {
-                                        "using": "xpath",
-                                        "value": f"//*[@name='{element_text}' or @label='{element_text}']"
-                                    }
+                                    raise Exception("Either accessibility_id or element_text must be provided")
                                 
-                                async with session.post(f"{remote_url}/session/{session_id}/element", json=find_payload) as find_resp:
-                                    if find_resp.status == 200:
-                                        find_data = await find_resp.json()
-                                        element_id = find_data["value"]["ELEMENT"] if "ELEMENT" in find_data["value"] else find_data["value"]["element-6066-11e4-a52e-4f735466cecf"]
-                                        
-                                        # Tap the element
-                                        async with session.post(f"{remote_url}/session/{session_id}/element/{element_id}/click") as tap_resp:
-                                            if tap_resp.status == 200:
-                                                logger.info(f"✅ Remote find and tap successful: {accessibility_id or element_text}")
-                                                return {
-                                                    "success": True,
-                                                    "element": accessibility_id or element_text,
-                                                    "session_id": session_id,
-                                                    "timestamp": datetime.now().isoformat()
-                                                }
-                                            else:
-                                                error_text = await tap_resp.text()
-                                                raise Exception(f"Tap failed: {tap_resp.status} - {error_text}")
+                                if not element_found:
+                                    raise Exception("Element could not be located")
+                                
+                                # Tap the element
+                                async with session.post(f"{remote_url}/session/{session_id}/element/{element_id}/click") as tap_resp:
+                                    if tap_resp.status == 200:
+                                        logger.info(f"✅ Remote find and tap successful: {accessibility_id or element_text}")
+                                        return {
+                                            "success": True,
+                                            "element": accessibility_id or element_text,
+                                            "session_id": session_id,
+                                            "timestamp": datetime.now().isoformat()
+                                        }
                                     else:
-                                        error_text = await find_resp.text()
-                                        raise Exception(f"Element not found: {find_resp.status} - {error_text}")
+                                        error_text = await tap_resp.text()
+                                        raise Exception(f"Tap failed: {tap_resp.status} - {error_text}")
                                         
                             finally:
                                 # Clean up session
