@@ -511,8 +511,9 @@ else:
                         "capabilities": {
                             "alwaysMatch": {
                                 "platformName": "iOS",
-                                "appium:deviceName": device_id,
-                                "appium:automationName": "XCUITest"
+                                "appium:deviceName": "iPhone 16 Pro",
+                                "appium:automationName": "XCUITest",
+                                "appium:udid": "4013533D-4166-4991-B3AD-5E4660AC2DD1"
                             }
                         }
                     }
