@@ -513,7 +513,10 @@ else:
                                 "platformName": "iOS",
                                 "appium:deviceName": "iPhone 16 Pro",
                                 "appium:automationName": "XCUITest",
-                                "appium:udid": "4013533D-4166-4991-B3AD-5E4660AC2DD1"
+                                "appium:udid": "4013533D-4166-4991-B3AD-5E4660AC2DD1",
+                                "appium:shouldTerminateApp": False,
+                                "appium:forceAppLaunch": False,
+                                "appium:newCommandTimeout": 300
                             }
                         }
                     }
@@ -606,7 +609,10 @@ else:
                                 "platformName": "iOS",
                                 "appium:deviceName": "iPhone 16 Pro",
                                 "appium:automationName": "XCUITest",
-                                "appium:udid": "4013533D-4166-4991-B3AD-5E4660AC2DD1"
+                                "appium:udid": "4013533D-4166-4991-B3AD-5E4660AC2DD1",
+                                "appium:shouldTerminateApp": False,
+                                "appium:forceAppLaunch": False,
+                                "appium:newCommandTimeout": 300
                             }
                         }
                     }
@@ -687,7 +693,10 @@ else:
                                 "appium:automationName": "XCUITest",
                                 "appium:udid": "4013533D-4166-4991-B3AD-5E4660AC2DD1",
                                 "appium:bundleId": bundle_id,
-                                "appium:autoLaunch": True
+                                "appium:autoLaunch": True,
+                                "appium:shouldTerminateApp": False,
+                                "appium:forceAppLaunch": False,
+                                "appium:newCommandTimeout": 300
                             }
                         }
                     }
@@ -757,7 +766,10 @@ else:
                                 "platformName": "iOS",
                                 "appium:deviceName": "iPhone 16 Pro",
                                 "appium:automationName": "XCUITest",
-                                "appium:udid": "4013533D-4166-4991-B3AD-5E4660AC2DD1"
+                                "appium:udid": "4013533D-4166-4991-B3AD-5E4660AC2DD1",
+                                "appium:shouldTerminateApp": False,
+                                "appium:forceAppLaunch": False,
+                                "appium:newCommandTimeout": 300
                             }
                         }
                     }
