@@ -26,7 +26,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application code (current directory is already ios_mcp_server)
 COPY . .
-RUN pip install -e .
 
 # Create non-root user
 RUN useradd -m -u 1000 fastmcp && \
