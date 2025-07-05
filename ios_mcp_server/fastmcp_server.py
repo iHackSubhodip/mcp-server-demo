@@ -20,14 +20,14 @@ from starlette.middleware import Middleware
 from starlette.middleware.cors import CORSMiddleware
 
 # Add the current directory to sys.path
-sys.path.insert(0, str(Path(__file__).parent))
-
-from automation.screenshot_service import ScreenshotService
-from automation.appium_client import AppiumClient  
-from automation.simulator_manager import SimulatorManager
-from tools.find_and_tap_tool import FindAndTapTool
-from config.settings import settings
-from utils.logger import get_logger
+    sys.path.insert(0, str(Path(__file__).parent))
+    
+    from automation.screenshot_service import ScreenshotService
+    from automation.appium_client import AppiumClient  
+    from automation.simulator_manager import SimulatorManager
+    from tools.find_and_tap_tool import FindAndTapTool
+    from config.settings import settings
+    from utils.logger import get_logger
 
 # Initialize logger
 logger = get_logger(__name__)
@@ -164,6 +164,8 @@ async def find_and_tap(
     element_text: Optional[str] = None,
     device_id: str = "booted",
     take_screenshot: bool = True,
+    dismiss_after_screenshot: bool = False,
+    dismiss_button_text: Optional[str] = None,
     ctx: Optional[Context] = None
 ) -> Dict[str, Any]:
     """
@@ -174,6 +176,8 @@ async def find_and_tap(
         element_text: Text content of element to find and tap  
         device_id: iOS simulator device ID (defaults to 'booted')
         take_screenshot: Whether to take screenshot after tapping
+        dismiss_after_screenshot: Whether to dismiss modal/screen after screenshot
+        dismiss_button_text: Specific text of dismiss button (e.g., 'Done', 'Cancel', 'Close')
     
     Returns:
         Tap operation results
@@ -197,7 +201,9 @@ async def find_and_tap(
         result = await find_and_tap_tool.execute_impl(
             accessibility_id=accessibility_id,
             element_text=element_text,
-            device_id=device_id
+            device_id=device_id,
+            dismiss_after_screenshot=dismiss_after_screenshot,
+            dismiss_button_text=dismiss_button_text
         )
         
         response = {
@@ -747,7 +753,7 @@ else:
             self.remote_host = os.getenv("REMOTE_IOS_HOST", "localhost")
             self.remote_port = os.getenv("REMOTE_IOS_PORT", "4723")
             
-        async def execute_impl(self, accessibility_id=None, element_text=None, device_id="booted"):
+        async def execute_impl(self, accessibility_id=None, element_text=None, device_id="booted", dismiss_after_screenshot=False, dismiss_button_text=None):
             try:
                 # Actually find and tap element via remote Appium server
                 import aiohttp
@@ -832,6 +838,84 @@ else:
                                 async with session.post(f"{remote_url}/session/{session_id}/element/{element_id}/click") as tap_resp:
                                     if tap_resp.status == 200:
                                         logger.info(f"✅ Remote find and tap successful: {accessibility_id or element_text}")
+                                        
+                                        # Dismiss modal/screen if requested
+                                        if dismiss_after_screenshot:
+                                            try:
+                                                logger.info("🔙 Attempting to dismiss modal/screen...")
+                                                dismiss_success = False
+                                                
+                                                # Define dismiss button texts to try
+                                                dismiss_texts = []
+                                                if dismiss_button_text:
+                                                    dismiss_texts.append(dismiss_button_text)
+                                                else:
+                                                    # Common dismiss button texts
+                                                    dismiss_texts = ["Done", "Cancel", "Close", "Back", "Dismiss", "OK"]
+                                                
+                                                # Try to find and tap dismiss buttons
+                                                for dismiss_text in dismiss_texts:
+                                                    try:
+                                                        # Try multiple selectors for dismiss button
+                                                        selectors = [
+                                                            {"using": "name", "value": dismiss_text},
+                                                            {"using": "xpath", "value": f"//XCUIElementTypeButton[@name='{dismiss_text}']"},
+                                                            {"using": "xpath", "value": f"//*[contains(@name, '{dismiss_text}')]"},
+                                                            {"using": "accessibility id", "value": dismiss_text}
+                                                        ]
+                                                        
+                                                        for selector in selectors:
+                                                            try:
+                                                                async with session.post(f"{remote_url}/session/{session_id}/element", json=selector) as dismiss_resp:
+                                                                    if dismiss_resp.status == 200:
+                                                                        dismiss_data = await dismiss_resp.json()
+                                                                        dismiss_id = dismiss_data["value"]["ELEMENT"] if "ELEMENT" in dismiss_data["value"] else dismiss_data["value"]["element-6066-11e4-a52e-4f735466cecf"]
+                                                                        await session.post(f"{remote_url}/session/{session_id}/element/{dismiss_id}/click")
+                                                                        logger.info(f"✅ Dismissed using '{dismiss_text}' button")
+                                                                        dismiss_success = True
+                                                                        break
+                                                            except Exception:
+                                                                continue
+                                                        
+                                                        if dismiss_success:
+                                                            break
+                                                            
+                                                    except Exception:
+                                                        continue
+                                                
+                                                # If no specific dismiss button found, try navigation bar back button
+                                                if not dismiss_success:
+                                                    try:
+                                                        # Try common navigation patterns
+                                                        nav_selectors = [
+                                                            {"using": "xpath", "value": "//XCUIElementTypeNavigationBar//XCUIElementTypeButton[1]"},  # First button in nav bar
+                                                            {"using": "xpath", "value": "//XCUIElementTypeButton[@name='Back']"},
+                                                            {"using": "xpath", "value": "//*[@name='chevron.left']"},  # iOS back chevron
+                                                            {"using": "xpath", "value": "//XCUIElementTypeButton[contains(@name, 'back')]"}
+                                                        ]
+                                                        
+                                                        for selector in nav_selectors:
+                                                            try:
+                                                                async with session.post(f"{remote_url}/session/{session_id}/element", json=selector) as nav_resp:
+                                                                    if nav_resp.status == 200:
+                                                                        nav_data = await nav_resp.json()
+                                                                        nav_id = nav_data["value"]["ELEMENT"] if "ELEMENT" in nav_data["value"] else nav_data["value"]["element-6066-11e4-a52e-4f735466cecf"]
+                                                                        await session.post(f"{remote_url}/session/{session_id}/element/{nav_id}/click")
+                                                                        logger.info("✅ Dismissed using navigation back button")
+                                                                        dismiss_success = True
+                                                                        break
+                                                            except Exception:
+                                                                continue
+                                                                
+                                                    except Exception:
+                                                        pass
+                                                
+                                                if not dismiss_success:
+                                                    logger.warning("⚠️ Could not find dismiss button - modal may still be open")
+                                                    
+                                            except Exception as dismiss_e:
+                                                logger.warning(f"⚠️ Dismiss failed: {dismiss_e}")
+                                        
                                         return {
                                             "success": True,
                                             "element": accessibility_id or element_text,
@@ -882,11 +966,11 @@ if __name__ == "__main__":
             host = "0.0.0.0"
         else:
             host = os.getenv("MCP_HOST", "127.0.0.1")
-        
-        logger.info(f"🎯 iOS Automation Server (FastMCP 2.0)")
-        logger.info(f"🐍 Python: {sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}")
-        logger.info(f"⚡ FastMCP: 2.9.2")
-        logger.info(f"🔌 Transport: {transport}")
+    
+    logger.info(f"🎯 iOS Automation Server (FastMCP 2.0)")
+    logger.info(f"🐍 Python: {sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}")
+    logger.info(f"⚡ FastMCP: 2.9.2")
+    logger.info(f"🔌 Transport: {transport}")
         
         if IS_CLOUD:
             logger.info("☁️  Cloud deployment detected - using SSE transport")
@@ -904,9 +988,9 @@ if __name__ == "__main__":
             import uvicorn
             logger.info(f"🚀 Starting server on http://{host}:{port}")
             uvicorn.run(app, host=host, port=port, log_level="info")
-        except KeyboardInterrupt:
-            logger.info("\n⏹️ FastMCP server stopped by user")
-        except Exception as e:
-            logger.error(f"💥 FastMCP server error: {e}")
-            sys.exit(1)
+    except KeyboardInterrupt:
+        logger.info("\n⏹️ FastMCP server stopped by user")
+    except Exception as e:
+        logger.error(f"💥 FastMCP server error: {e}")
+        sys.exit(1)
     main() 
