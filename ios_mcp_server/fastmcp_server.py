@@ -20,14 +20,14 @@ from starlette.middleware import Middleware
 from starlette.middleware.cors import CORSMiddleware
 
 # Add the current directory to sys.path
-    sys.path.insert(0, str(Path(__file__).parent))
-    
-    from automation.screenshot_service import ScreenshotService
-    from automation.appium_client import AppiumClient  
-    from automation.simulator_manager import SimulatorManager
-    from tools.find_and_tap_tool import FindAndTapTool
-    from config.settings import settings
-    from utils.logger import get_logger
+sys.path.insert(0, str(Path(__file__).parent))
+
+from automation.screenshot_service import ScreenshotService
+from automation.appium_client import AppiumClient  
+from automation.simulator_manager import SimulatorManager
+from tools.find_and_tap_tool import FindAndTapTool
+from config.settings import settings
+from utils.logger import get_logger
 
 # Initialize logger
 logger = get_logger(__name__)
@@ -967,10 +967,10 @@ if __name__ == "__main__":
         else:
             host = os.getenv("MCP_HOST", "127.0.0.1")
     
-    logger.info(f"🎯 iOS Automation Server (FastMCP 2.0)")
-    logger.info(f"🐍 Python: {sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}")
-    logger.info(f"⚡ FastMCP: 2.9.2")
-    logger.info(f"🔌 Transport: {transport}")
+        logger.info(f"🎯 iOS Automation Server (FastMCP 2.0)")
+        logger.info(f"🐍 Python: {sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}")
+        logger.info(f"⚡ FastMCP: 2.9.2")
+        logger.info(f"🔌 Transport: {transport}")
         
         if IS_CLOUD:
             logger.info("☁️  Cloud deployment detected - using SSE transport")
@@ -988,9 +988,10 @@ if __name__ == "__main__":
             import uvicorn
             logger.info(f"🚀 Starting server on http://{host}:{port}")
             uvicorn.run(app, host=host, port=port, log_level="info")
-    except KeyboardInterrupt:
-        logger.info("\n⏹️ FastMCP server stopped by user")
-    except Exception as e:
-        logger.error(f"💥 FastMCP server error: {e}")
-        sys.exit(1)
+        except KeyboardInterrupt:
+            logger.info("\n⏹️ FastMCP server stopped by user")
+        except Exception as e:
+            logger.error(f"💥 FastMCP server error: {e}")
+            sys.exit(1)
+    
     main() 
