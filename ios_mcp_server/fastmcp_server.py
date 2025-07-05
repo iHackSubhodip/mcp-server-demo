@@ -5,6 +5,7 @@ Modern FastMCP iOS Automation Server
 A clean FastMCP 2.0 implementation that leverages all existing iOS automation
 services while providing FastMCP's modern, Pythonic interface.
 """
+# Redeploy trigger - updated ngrok URL
 
 import os
 import sys
