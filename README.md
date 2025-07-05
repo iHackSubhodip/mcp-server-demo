@@ -1,12 +1,13 @@
 # iOS MCP Server
 
-> Mobile automation server built with clean architecture and SOLID principles
+> Modern iOS automation server built with FastMCP 2.0 and clean architecture
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 [![Platform: macOS](https://img.shields.io/badge/platform-macOS-lightgrey.svg)](https://www.apple.com/macos/)
+[![FastMCP](https://img.shields.io/badge/FastMCP-2.0-green.svg)](https://github.com/jlowin/fastmcp)
 
-A production-ready iOS automation MCP server that transforms monolithic automation scripts into maintainable, extensible architecture. Built following SOLID principles with comprehensive error handling, beautiful logging, and professional design patterns.
+A production-ready iOS automation MCP server built with FastMCP 2.0, offering both local and cloud deployment options. Features clean architecture, comprehensive error handling, and professional logging.
 
 ## 📺 Demo Video
 
@@ -14,96 +15,128 @@ A production-ready iOS automation MCP server that transforms monolithic automati
 
 **🎬 Watch the Complete Demo**: [iOS MCP Server in Action](https://www.youtube.com/watch?v=480AmvL9ziQ)
 
-See real iOS automation with Claude Desktop integration! The video demonstrates:
-- **Live iOS Automation** - Real device interaction
-- **Claude Desktop Integration** - Seamless MCP protocol usage  
-- **Advanced Element Finding** - Smart accessibility ID detection
-- **Auto-Dismiss Features** - Modal handling automation
-- **Complete Workflow** - End-to-end app testing
-
 ## ✨ Features
 
+- 🚀 **FastMCP 2.0** - Modern Python-first MCP implementation
+- 🌐 **Cloud Deployment** - Ready for Railway, Heroku, or other platforms
+- 📱 **Real iOS Automation** - Appium + WebDriverAgent integration
 - 🏗️ **Clean Architecture** - SOLID principles and design patterns
 - 🎨 **Beautiful Logging** - Colored console output with emojis
 - 🔧 **Type-Safe** - Comprehensive type hints throughout
-- 📱 **Real iOS Automation** - Appium + WebDriverAgent integration
 - 🔌 **Extensible** - Plugin-style tool system
-- 🚀 **Production Ready** - Robust error handling and monitoring
 
 ## 🚀 Quick Start
 
-### Prerequisites
+### Option 1: Remote Server (Recommended)
 
-- macOS (required for iOS automation)
-- Python 3.11+
-- Xcode with iOS Simulator
-- Node.js (for Appium)
+Use the hosted version on Railway - no local setup required:
 
-### Installation
-
-1. **Clone the repository**
-```bash
-   git clone https://github.com/iHackSubhodip/mcp-server-demo.git
-   cd mcp-server-demo
-   ```
-
-2. **Start the server**
-```bash
-   ./start_ios_mcp.sh
-   ```
-
-3. **Connect to Claude Desktop**
-   
-   Add to your Claude Desktop config:
 ```json
 {
   "mcpServers": {
-    "ios-automation": {
-         "command": "python",
-         "args": ["-m", "ios_mcp_server.main"],
-         "cwd": "/path/to/mcp-server-demo"
+    "ios-automation-railway": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-remote",
+        "https://mcp-server-demo-production.up.railway.app/sse/"
+      ]
     }
   }
 }
 ```
 
+### Option 2: Local Development
+
+1. **Prerequisites**
+   - macOS (required for iOS automation)
+   - Python 3.11+
+   - Xcode with iOS Simulator
+   - Node.js (for Appium)
+
+2. **Installation**
+   ```bash
+   git clone https://github.com/iHackSubhodip/mcp-server-demo.git
+   cd mcp-server-demo
+   pip install -r ios_mcp_server/requirements.txt
+   ```
+
+3. **Claude Desktop Configuration**
+   ```json
+   {
+     "mcpServers": {
+       "ios-automation-local": {
+         "command": "python",
+         "args": ["-m", "ios_mcp_server.main"],
+         "cwd": "/path/to/mcp-server-demo"
+       }
+     }
+   }
+   ```
+
 ## 🏗️ Architecture
-
-### System Architecture
-![System Architecture](archDiagram.png)
-
-### Module Interactions
-![Module Interaction Diagram](moduleInteractionDiagram.png)
-
-### Sequence Flow
-![Sequence Diagram](sequenceDiagram.png)
 
 ### Directory Structure
 ```
 ios_mcp_server/
-├── main.py                       # Entry point
-├── config/settings.py           # Configuration
-├── utils/                       # Shared utilities
-│   ├── logger.py               # Colored logging
-│   ├── exceptions.py           # Custom exceptions
-│   └── command_runner.py       # Async commands
-├── automation/                  # Core services
-│   ├── appium_client.py        # iOS automation
-│   ├── simulator_manager.py    # Simulator control
-│   └── screenshot_service.py   # Screenshots
-├── tools/                       # MCP tools
-│   ├── base_tool.py            # Abstract base
-│   ├── tool_registry.py        # Tool management
-│   ├── appium_tap_type_tool.py # Main automation
-│   ├── screenshot_tool.py      # Screenshot capture
-│   └── launch_app_tool.py      # App launcher
-└── server/mcp_server.py         # MCP protocol
+├── main.py                     # Entry point
+├── fastmcp_server.py          # FastMCP 2.0 server
+├── config/
+│   └── settings.py           # Configuration management
+├── automation/               # Core automation services
+│   ├── appium_client.py     # iOS automation client
+│   ├── screenshot_service.py # Screenshot handling
+│   └── simulator_manager.py # Simulator management
+├── tools/                   # MCP tools
+│   ├── base_tool.py        # Abstract base class
+│   ├── tool_registry.py    # Tool management
+│   ├── appium_tap_type_tool.py
+│   ├── find_and_tap_tool.py
+│   ├── launch_app_tool.py
+│   └── screenshot_tool.py
+├── utils/                   # Shared utilities
+│   ├── logger.py           # Colored logging
+│   ├── exceptions.py       # Custom exceptions
+│   └── command_runner.py   # Async command execution
+├── server/                  # Traditional MCP server
+├── screenshots/             # Screenshot storage
+├── Dockerfile              # Container deployment
+├── Procfile                # Railway deployment
+└── requirements.txt        # Dependencies
 ```
 
 ## 🔧 Available Tools
 
+### `take_screenshot`
+Capture iOS simulator screenshots
+```json
+{
+  "filename": "optional_name.png",
+  "device_id": "booted"
+}
+```
+
+### `launch_app`
+Launch iOS applications
+```json
+{
+  "bundle_id": "com.apple.mobilesafari",
+  "device_id": "booted"
+}
+```
+
+### `find_and_tap`
+Find and tap UI elements with smart automation
+```json
+{
+  "accessibility_id": "submitButton",
+  "take_screenshot": true,
+  "dismiss_after_screenshot": false
+}
+```
+
 ### `appium_tap_and_type`
-Real iOS automation with intelligent element finding
+Enhanced text input with element finding
 ```json
 {
   "text": "Hello World!",
@@ -112,96 +145,75 @@ Real iOS automation with intelligent element finding
 }
 ```
 
-### `take_screenshot`
-Capture high-quality iOS screenshots
+### `list_simulators`
+List available iOS simulators
 ```json
-{
-  "filename": "optional_name.png"
-}
+{}
 ```
 
-### `launch_app`
-Launch iOS applications with validation
+### `get_server_status`
+Check server and Appium status
 ```json
-{
-  "bundle_id": "com.example.app"
-}
+{}
 ```
 
-## 🎮 Server Management
+## 🛠️ Development
 
-### Start Server
+### Local FastMCP Development
 ```bash
-./start_ios_mcp.sh
-```
-
-### Restart Server
-```bash
-pkill -f "ios_mcp_server" || true
-pkill -f appium || true
-./start_ios_mcp.sh
-```
-
-### Stop Server
-```bash
-pkill -f "ios_mcp_server|appium"
-```
-
-### Check Status
-```bash
-ps aux | grep -E "(ios_mcp_server|appium)" | grep -v grep
-curl -s http://localhost:4723/status | python3 -m json.tool
-```
-
-## 🏭 Design Patterns
-
-- **Template Method**: `BaseTool` consistent execution
-- **Registry**: `ToolRegistry` centralized management  
-- **Factory**: Tool instantiation
-- **Strategy**: Multiple automation approaches
-- **Dependency Injection**: Configuration injection
-
-## 📊 Migration Benefits
-
-| Before | After |
-|--------|-------|
-| 414-line monolithic file | 20+ focused modules |
-| No error handling | Professional error handling |
-| Basic logging | Colored logging with emojis |
-| Hard to extend | Plugin-style architecture |
-| No type safety | 100% type-hinted |
-| Poor maintainability | SOLID principles |
-
-## 🛠️ Development Setup
-
-### Manual Setup
-```bash
-# Create virtual environment
-python -m venv ios_mcp_env
-source ios_mcp_env/bin/activate
-
 # Install dependencies
-pip install -r requirements.txt
+pip install -r ios_mcp_server/requirements.txt
 
+# Run FastMCP server
+python ios_mcp_server/fastmcp_server.py
+```
+
+### Traditional MCP Development
+```bash
+# Run traditional MCP server
+python -m ios_mcp_server.main
+```
+
+### Appium Setup
+```bash
 # Install Appium
 npm install -g appium
 appium driver install xcuitest
+
+# Start Appium server
+appium server --port 4723
 ```
 
-### WebDriverAgent Setup
-```bash
-git clone https://github.com/appium/WebDriverAgent.git
-open WebDriverAgent/WebDriverAgent.xcodeproj
-```
+## 🌐 Cloud Deployment
 
-Configure in Xcode:
-- Select your Apple Developer Team
-- Update Bundle IDs to be unique
-- Build and test the project
+This server is deployed on Railway and accessible via:
+- **HTTP Endpoint**: `https://mcp-server-demo-production.up.railway.app/`
+- **SSE Endpoint**: `https://mcp-server-demo-production.up.railway.app/sse/`
+
+The cloud deployment simulates iOS automation responses for demonstration purposes.
+
+## 📊 Key Improvements
+
+| Feature | Traditional MCP | FastMCP 2.0 |
+|---------|----------------|-------------|
+| **Setup** | Complex configuration | Simple Python decorators |
+| **Type Safety** | Manual validation | Built-in Pydantic models |
+| **Error Handling** | Basic try-catch | Rich context and logging |
+| **Deployment** | Local only | Cloud-ready with Railway |
+| **Development** | Boilerplate heavy | Clean, intuitive API |
 
 ## 🔍 Troubleshooting
 
-### Appium Connection Issues
+### Simulator Issues
+```bash
+# List available simulators
+xcrun simctl list devices
+
+# Boot a simulator
+xcrun simctl boot "iPhone 16 Pro"
+```
+
+### Appium Connection
 ```bash
 # Check Appium status
 curl http://localhost:4723/status
@@ -210,36 +222,21 @@ curl http://localhost:4723/status
 pkill -f appium && appium server --port 4723
 ```
 
-### Simulator Issues
-```bash
-# List simulators
-xcrun simctl list devices
-
-# Boot simulator
-xcrun simctl boot "iPhone 16 Pro"
-```
-
-### WebDriverAgent Issues
-```bash
-cd WebDriverAgent
-xcodebuild -project WebDriverAgent.xcodeproj \
-  -scheme WebDriverAgentRunner \
-  -destination 'platform=iOS Simulator,name=iPhone 16 Pro' test
-```
-
 ## 📝 Dependencies
 
-```
-mcp>=1.0.0          # MCP protocol
-aiohttp>=3.9.0      # HTTP client for Appium
-```
+Core dependencies:
+- `fastmcp>=2.9.2` - FastMCP 2.0 framework
+- `mcp>=1.0.0` - Traditional MCP protocol
+- `aiohttp>=3.9.0` - HTTP client for automation
+- `appium-python-client>=3.0.0` - iOS automation
+- `pydantic>=2.4.0` - Data validation
 
 ## 🤝 Contributing
 
 1. Fork the repository
 2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
+3. Follow the existing architecture patterns
+4. Add comprehensive error handling
 5. Submit a pull request
 
 ## 📄 License

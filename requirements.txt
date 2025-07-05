@@ -1,9 +1,0 @@
-# Core MCP Server Dependencies
-mcp>=1.0.0
-
-# HTTP client for Appium communication
-aiohttp>=3.9.0
-
-# Note: All other dependencies are either:
-# - Built-in Python modules (asyncio, json, sys, pathlib, tempfile, etc.)
-# - Not actually used in the codebase
