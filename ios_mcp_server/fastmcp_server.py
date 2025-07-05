@@ -500,15 +500,20 @@ else:
                     filename = f"screenshot_{timestamp}.png"
                 
                 # Try to connect to remote Appium server for screenshot
-                remote_url = f"http://{self.remote_host}:{self.remote_port}/wd/hub"
+                # Use HTTPS for ngrok tunnels, HTTP for direct connections
+                protocol = "https" if "ngrok" in self.remote_host else "http"
+                port_suffix = "" if "ngrok" in self.remote_host else f":{self.remote_port}"
+                remote_url = f"{protocol}://{self.remote_host}{port_suffix}"
                 
                 async with aiohttp.ClientSession() as session:
-                    # Create a session
+                    # Create a session (W3C format)
                     session_payload = {
                         "capabilities": {
-                            "platformName": "iOS",
-                            "deviceName": device_id,
-                            "automationName": "XCUITest"
+                            "alwaysMatch": {
+                                "platformName": "iOS",
+                                "appium:deviceName": device_id,
+                                "appium:automationName": "XCUITest"
+                            }
                         }
                     }
                     
