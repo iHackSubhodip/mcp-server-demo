@@ -11,9 +11,9 @@ A production-ready iOS automation MCP server built with FastMCP 2.0, offering bo
 
 ## 📺 Demo Video
 
-[![iOS MCP Server Demo](https://img.youtube.com/vi/480AmvL9ziQ/maxresdefault.jpg)](https://www.youtube.com/watch?v=480AmvL9ziQ)
+[![iOS MCP Server Demo](https://img.youtube.com/vi/480AmvL9ziQ/maxresdefault.jpg)](https://youtu.be/fVqE7nLfqoE)
 
-**🎬 Watch the Complete Demo**: [iOS MCP Server in Action](https://www.youtube.com/watch?v=480AmvL9ziQ)
+**🎬 Watch the Complete Demo**: [iOS MCP Server in Action](https://youtu.be/fVqE7nLfqoE)
 
 ## ✨ Features
 
