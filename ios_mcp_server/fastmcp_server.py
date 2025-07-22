@@ -23,10 +23,10 @@ from starlette.middleware.cors import CORSMiddleware
 # Add the current directory to sys.path
 sys.path.insert(0, str(Path(__file__).parent))
 
-from automation.screenshot_service import ScreenshotService
-from automation.appium_client import AppiumClient  
-from automation.simulator_manager import SimulatorManager
-from tools.ios.find_and_tap_tool import FindAndTapTool
+from platforms.ios.automation.screenshot_service import ScreenshotService
+from platforms.ios.automation.appium_client import AppiumClient  
+from platforms.ios.automation.simulator_manager import SimulatorManager
+from platforms.ios.tools.find_and_tap_tool import FindAndTapTool
 from config.settings import settings
 from shared.utils.logger import get_logger
 

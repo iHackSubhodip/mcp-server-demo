@@ -10,9 +10,9 @@ from pathlib import Path
 from typing import Dict, Any, List
 
 # Add the ios_mcp_server directory to sys.path
-sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
 
-from automation.simulator_manager import SimulatorManager
+from ..automation.simulator_manager import SimulatorManager
 from config.settings import settings
 from shared.utils.exceptions import AppLaunchError
 

@@ -14,9 +14,9 @@ from pathlib import Path
 from typing import Dict, Any, List, Optional, Union
 
 # Add the ios_mcp_server directory to sys.path
-sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
 
-from automation.appium_client import AppiumClient
+from ..automation.appium_client import AppiumClient
 from config.settings import settings
 from shared.utils.logger import get_logger
 from shared.utils.exceptions import AutomationError, ValidationError
