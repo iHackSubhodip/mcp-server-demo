@@ -77,35 +77,40 @@ Use the hosted version on Railway - no local setup required:
 
 ## 🏗️ Architecture
 
-The iOS MCP Server follows a clean, modular architecture with recently reorganized tool structure for better maintainability and extensibility.
+The iOS MCP Server follows a clean, modular architecture with complete platform segregation for maximum maintainability and cross-platform extensibility.
 
 ### Recent Improvements ✨
-- **Tool Organization**: iOS-specific tools moved to dedicated `tools/ios/` subdirectory
-- **Package Structure**: Proper Python package initialization with `__init__.py` files
-- **Import Clarity**: Clean separation between shared tools and platform-specific tools
-- **Maintainability**: Easier to add new platform tools (Android, etc.) in the future
+- **Platform Segregation**: Complete separation of shared vs iOS-specific code
+- **Clean Architecture**: Cross-platform utilities in `shared/`, iOS code in `platforms/ios/`
+- **Modular Configuration**: Shared configs for cross-platform, iOS configs for platform-specific
+- **Future-Ready**: Easy to add Android platform in `platforms/android/`
+- **Maintainable Structure**: Clear separation of concerns across platforms
 
 ### Directory Structure
 ```
 ios_mcp_server/
 ├── fastmcp_server.py          # FastMCP 2.0 server (main entry point)
-├── config/
-│   └── settings.py           # Configuration management
-├── automation/               # Core automation services
-│   ├── appium_client.py     # iOS automation client
-│   ├── screenshot_service.py # Screenshot handling
-│   └── simulator_manager.py # Simulator management
-├── tools/
-│   └── ios/                # iOS-specific tools
-│       ├── __init__.py     # Package initialization
-│       ├── appium_tap_type_tool.py # Text field automation
-│       ├── find_and_tap_tool.py    # Advanced element finding
-│       ├── launch_app_tool.py      # App launching
-│       └── screenshot_tool.py      # Screenshot capture
-├── utils/                   # Shared utilities
-│   ├── logger.py           # Colored logging
-│   ├── exceptions.py       # Custom exceptions
-│   └── command_runner.py   # Async command execution
+├── shared/                    # Cross-platform utilities
+│   ├── utils/                # Platform-agnostic utilities  
+│   │   ├── logger.py        # Colored logging with emojis
+│   │   ├── exceptions.py    # Exception hierarchy
+│   │   └── command_runner.py # Shell command execution
+│   └── config/              # Base configuration classes
+│       └── base_settings.py # AppiumConfig, ServerConfig
+├── platforms/ios/           # iOS-specific platform code
+│   ├── automation/         # iOS automation services
+│   │   ├── appium_client.py # iOS automation client
+│   │   ├── screenshot_service.py # Screenshot handling
+│   │   └── simulator_manager.py # Simulator management
+│   ├── tools/             # iOS-specific MCP tools
+│   │   ├── appium_tap_type_tool.py # Text field automation
+│   │   ├── find_and_tap_tool.py    # Advanced element finding
+│   │   ├── launch_app_tool.py      # App launching
+│   │   └── screenshot_tool.py      # Screenshot capture
+│   └── config/            # iOS-specific configuration
+│       └── ios_settings.py # iOSConfig for XCUITest, iPhone settings
+└── config/
+    └── settings.py        # Unified configuration interface
 ├── screenshots/             # Screenshot storage
 ├── Dockerfile              # Container deployment
 ├── Procfile                # Railway deployment
@@ -178,7 +183,7 @@ python ios_mcp_server/fastmcp_server.py
 ### Local Development Commands
 ```bash
 # Run FastMCP server locally
-python ios_mcp_server/fastmcp_server.py
+cd ios_mcp_server && python fastmcp_server.py
 ```
 
 ### Appium Setup
