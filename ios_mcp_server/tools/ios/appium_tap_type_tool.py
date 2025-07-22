@@ -5,13 +5,18 @@ This tool provides the main functionality for finding text fields,
 tapping them, and typing text using real Appium automation.
 """
 
+import sys
+from pathlib import Path
 from typing import Dict, Any, List, Optional
 
+# Add the ios_mcp_server directory to sys.path
+sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+
 try:
-    from .base_tool import BaseTool, ToolArgument
-    from ..automation.appium_client import AppiumClient
-    from ..config.settings import settings
-    from ..utils.exceptions import AutomationError
+    from tools.base_tool import BaseTool, ToolArgument
+    from automation.appium_client import AppiumClient
+    from config.settings import settings
+    from utils.exceptions import AutomationError
 except ImportError:
     # Fallback for Claude Desktop context
     import sys
@@ -19,7 +24,7 @@ except ImportError:
     
     # Add the ios_mcp_server to path if not already there
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    parent_dir = os.path.dirname(current_dir)
+    parent_dir = os.path.dirname(os.path.dirname(current_dir))
     if parent_dir not in sys.path:
         sys.path.insert(0, parent_dir)
     

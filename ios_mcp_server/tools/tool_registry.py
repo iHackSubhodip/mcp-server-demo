@@ -5,15 +5,20 @@ This module provides a centralized registry for all available MCP tools,
 implementing the Registry pattern for clean tool management.
 """
 
+import sys
+from pathlib import Path
 from typing import Dict, List, Type, Optional
 from abc import ABC
 
+# Add the ios_mcp_server directory to sys.path
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
 from .base_tool import BaseTool
-from .appium_tap_type_tool import AppiumTapTypeTool
-from .screenshot_tool import ScreenshotTool
-from .launch_app_tool import LaunchAppTool
-from .find_and_tap_tool import FindAndTapTool
-from ..utils.logger import get_logger
+from .ios.appium_tap_type_tool import AppiumTapTypeTool
+from .ios.screenshot_tool import ScreenshotTool
+from .ios.launch_app_tool import LaunchAppTool
+from .ios.find_and_tap_tool import FindAndTapTool
+from utils.logger import get_logger
 
 logger = get_logger(__name__)
 

@@ -24,6 +24,7 @@ A production-ready iOS automation MCP server built with FastMCP 2.0, offering bo
 - 🎨 **Beautiful Logging** - Colored console output with emojis
 - 🔧 **Type-Safe** - Comprehensive type hints throughout
 - 🔌 **Extensible** - Plugin-style tool system
+- 📁 **Organized Structure** - iOS tools properly organized in dedicated subdirectories
 
 ## 🚀 Quick Start
 
@@ -76,6 +77,14 @@ Use the hosted version on Railway - no local setup required:
 
 ## 🏗️ Architecture
 
+The iOS MCP Server follows a clean, modular architecture with recently reorganized tool structure for better maintainability and extensibility.
+
+### Recent Improvements ✨
+- **Tool Organization**: iOS-specific tools moved to dedicated `tools/ios/` subdirectory
+- **Package Structure**: Proper Python package initialization with `__init__.py` files
+- **Import Clarity**: Clean separation between shared tools and platform-specific tools
+- **Maintainability**: Easier to add new platform tools (Android, etc.) in the future
+
 ### Directory Structure
 ```
 ios_mcp_server/
@@ -90,10 +99,12 @@ ios_mcp_server/
 ├── tools/                   # MCP tools
 │   ├── base_tool.py        # Abstract base class
 │   ├── tool_registry.py    # Tool management
-│   ├── appium_tap_type_tool.py
-│   ├── find_and_tap_tool.py
-│   ├── launch_app_tool.py
-│   └── screenshot_tool.py
+│   └── ios/                # iOS-specific tools
+│       ├── __init__.py     # Package initialization
+│       ├── appium_tap_type_tool.py # Text field automation
+│       ├── find_and_tap_tool.py    # Advanced element finding
+│       ├── launch_app_tool.py      # App launching
+│       └── screenshot_tool.py      # Screenshot capture
 ├── utils/                   # Shared utilities
 │   ├── logger.py           # Colored logging
 │   ├── exceptions.py       # Custom exceptions

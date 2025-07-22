@@ -5,11 +5,16 @@ This tool provides functionality for taking screenshots of iOS simulators
 with proper error handling and file management.
 """
 
+import sys
+from pathlib import Path
 from typing import Dict, Any, List, Optional
 
-from .base_tool import BaseTool, ToolArgument
-from ..automation.screenshot_service import ScreenshotService
-from ..utils.exceptions import ScreenshotError
+# Add the ios_mcp_server directory to sys.path
+sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+
+from tools.base_tool import BaseTool, ToolArgument
+from automation.screenshot_service import ScreenshotService
+from utils.exceptions import ScreenshotError
 
 
 class ScreenshotTool(BaseTool):

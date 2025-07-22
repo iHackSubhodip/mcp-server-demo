@@ -5,12 +5,17 @@ This tool provides functionality for launching iOS applications on simulators
 with proper error handling and process management.
 """
 
+import sys
+from pathlib import Path
 from typing import Dict, Any, List, Optional
 
-from .base_tool import BaseTool, ToolArgument
-from ..automation.simulator_manager import SimulatorManager
-from ..config.settings import settings
-from ..utils.exceptions import AppLaunchError
+# Add the ios_mcp_server directory to sys.path
+sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+
+from tools.base_tool import BaseTool, ToolArgument
+from automation.simulator_manager import SimulatorManager
+from config.settings import settings
+from utils.exceptions import AppLaunchError
 
 
 class LaunchAppTool(BaseTool):
