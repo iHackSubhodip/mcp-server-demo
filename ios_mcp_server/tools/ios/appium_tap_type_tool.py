@@ -1,51 +1,38 @@
 """
 Appium tap and type tool for iOS automation.
 
-This tool provides the main functionality for finding text fields,
-tapping them, and typing text using real Appium automation.
+This tool provides advanced text input functionality for iOS automation,
+handling complex text field interactions with proper error handling.
 """
 
+import asyncio
+import tempfile
+import os
 import sys
 from pathlib import Path
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, Optional
 
-# Add the ios_mcp_server directory to sys.path
+# Add the ios_mcp_server directory to sys.path for proper imports
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-try:
-    from tools.base_tool import BaseTool, ToolArgument
-    from automation.appium_client import AppiumClient
-    from config.settings import settings
-    from utils.exceptions import AutomationError
-except ImportError:
-    # Fallback for Claude Desktop context
-    import sys
-    import os
-    
-    # Add the ios_mcp_server to path if not already there
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    parent_dir = os.path.dirname(os.path.dirname(current_dir))
-    if parent_dir not in sys.path:
-        sys.path.insert(0, parent_dir)
-    
-    from tools.base_tool import BaseTool, ToolArgument
-    from automation.appium_client import AppiumClient
-    from config.settings import settings
-    from utils.exceptions import AutomationError
+from automation.appium_client import AppiumClient
+from config.settings import settings
+from utils.logger import get_logger
+from utils.exceptions import AutomationError, ValidationError
 
 
-class AppiumTapTypeTool(BaseTool):
+class AppiumTapTypeTool:
     """
-    Tool for tapping text fields and typing text using Appium automation.
+    Advanced tool for text input using Appium automation.
     
-    This is the main tool that replaces the old coordinate-based and
-    AppleScript approaches with real iOS automation using Appium.
+    This tool provides robust text field interaction capabilities with
+    multiple finding strategies and error recovery mechanisms.
     """
     
     def __init__(self):
         """Initialize the Appium tap and type tool."""
-        super().__init__()
         self.appium_client = AppiumClient()
+        self.logger = get_logger(__name__)
     
     @property
     def name(self) -> str:

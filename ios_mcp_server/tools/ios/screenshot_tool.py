@@ -7,27 +7,25 @@ with proper error handling and file management.
 
 import sys
 from pathlib import Path
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, Optional
 
 # Add the ios_mcp_server directory to sys.path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from tools.base_tool import BaseTool, ToolArgument
 from automation.screenshot_service import ScreenshotService
 from utils.exceptions import ScreenshotError
 
 
-class ScreenshotTool(BaseTool):
+class ScreenshotTool:
     """
     Tool for taking screenshots of iOS simulators.
     
-    This tool provides a clean interface for capturing simulator screenshots
-    with automatic filename generation and proper error handling.
+    This tool provides a clean interface for screenshot capture with proper
+    error handling and file management.
     """
     
     def __init__(self):
         """Initialize the screenshot tool."""
-        super().__init__()
         self.screenshot_service = ScreenshotService()
     
     @property

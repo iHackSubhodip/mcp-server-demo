@@ -12,13 +12,12 @@ from typing import Dict, Any, List, Optional
 # Add the ios_mcp_server directory to sys.path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from tools.base_tool import BaseTool, ToolArgument
 from automation.simulator_manager import SimulatorManager
 from config.settings import settings
 from utils.exceptions import AppLaunchError
 
 
-class LaunchAppTool(BaseTool):
+class LaunchAppTool:
     """
     Tool for launching iOS applications on simulators.
     
@@ -28,7 +27,6 @@ class LaunchAppTool(BaseTool):
     
     def __init__(self):
         """Initialize the launch app tool."""
-        super().__init__()
         self.simulator_manager = SimulatorManager()
     
     @property

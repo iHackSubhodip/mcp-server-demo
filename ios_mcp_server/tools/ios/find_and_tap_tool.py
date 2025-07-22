@@ -16,14 +16,13 @@ from typing import Dict, Any, List, Optional, Union
 # Add the ios_mcp_server directory to sys.path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from tools.base_tool import BaseTool, ToolArgument
 from automation.appium_client import AppiumClient
 from config.settings import settings
 from utils.logger import get_logger
 from utils.exceptions import AutomationError, ValidationError
 
 
-class FindAndTapTool(BaseTool):
+class FindAndTapTool:
     """
     Advanced tool for finding and tapping UI elements on iOS.
     

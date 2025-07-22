@@ -68,7 +68,7 @@ Use the hosted version on Railway - no local setup required:
      "mcpServers": {
        "ios-automation-local": {
          "command": "python",
-         "args": ["-m", "ios_mcp_server.main"],
+         "args": ["ios_mcp_server/fastmcp_server.py"],
          "cwd": "/path/to/mcp-server-demo"
        }
      }
@@ -88,17 +88,14 @@ The iOS MCP Server follows a clean, modular architecture with recently reorganiz
 ### Directory Structure
 ```
 ios_mcp_server/
-├── main.py                     # Entry point
-├── fastmcp_server.py          # FastMCP 2.0 server
+├── fastmcp_server.py          # FastMCP 2.0 server (main entry point)
 ├── config/
 │   └── settings.py           # Configuration management
 ├── automation/               # Core automation services
 │   ├── appium_client.py     # iOS automation client
 │   ├── screenshot_service.py # Screenshot handling
 │   └── simulator_manager.py # Simulator management
-├── tools/                   # MCP tools
-│   ├── base_tool.py        # Abstract base class
-│   ├── tool_registry.py    # Tool management
+├── tools/
 │   └── ios/                # iOS-specific tools
 │       ├── __init__.py     # Package initialization
 │       ├── appium_tap_type_tool.py # Text field automation
@@ -109,7 +106,6 @@ ios_mcp_server/
 │   ├── logger.py           # Colored logging
 │   ├── exceptions.py       # Custom exceptions
 │   └── command_runner.py   # Async command execution
-├── server/                  # Traditional MCP server
 ├── screenshots/             # Screenshot storage
 ├── Dockerfile              # Container deployment
 ├── Procfile                # Railway deployment
@@ -179,10 +175,10 @@ pip install -r ios_mcp_server/requirements.txt
 python ios_mcp_server/fastmcp_server.py
 ```
 
-### Traditional MCP Development
+### Local Development Commands
 ```bash
-# Run traditional MCP server
-python -m ios_mcp_server.main
+# Run FastMCP server locally
+python ios_mcp_server/fastmcp_server.py
 ```
 
 ### Appium Setup
