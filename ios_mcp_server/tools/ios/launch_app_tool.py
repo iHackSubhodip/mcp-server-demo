@@ -7,7 +7,7 @@ with proper error handling and process management.
 
 import sys
 from pathlib import Path
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, List
 
 # Add the ios_mcp_server directory to sys.path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))

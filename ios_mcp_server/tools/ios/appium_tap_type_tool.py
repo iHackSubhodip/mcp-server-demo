@@ -10,7 +10,7 @@ import tempfile
 import os
 import sys
 from pathlib import Path
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 
 # Add the ios_mcp_server directory to sys.path for proper imports
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
