@@ -17,8 +17,8 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from automation.appium_client import AppiumClient
 from config.settings import settings
-from utils.logger import get_logger
-from utils.exceptions import AutomationError, ValidationError
+from shared.utils.logger import get_logger
+from shared.utils.exceptions import AutomationError, ValidationError
 
 
 class AppiumTapTypeTool:

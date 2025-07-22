@@ -16,9 +16,9 @@ from datetime import datetime
 if __name__ == "__main__":
     sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from utils.command_runner import run_command
-from utils.logger import get_logger
-from utils.exceptions import ScreenshotError
+from shared.utils.command_runner import run_command
+from shared.utils.logger import get_logger
+from shared.utils.exceptions import ScreenshotError
 
 logger = get_logger(__name__)
 

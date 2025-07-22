@@ -1,19 +1,19 @@
 """
-Custom exception classes for iOS MCP Server.
+Shared exception classes for cross-platform MCP automation.
 
 This module defines a hierarchy of exceptions that provide clear,
-actionable error information throughout the application.
+actionable error information for iOS, Android, and other platforms.
 """
 
 from typing import Optional, Dict, Any
 
 
-class iOSMCPError(Exception):
+class AutomationMCPError(Exception):
     """
-    Base exception class for all iOS MCP Server errors.
+    Base exception class for all MCP automation errors.
     
     This provides a common interface for all custom exceptions
-    and includes helpful context information.
+    and includes helpful context information across platforms.
     """
     
     def __init__(self, message: str, context: Optional[Dict[str, Any]] = None):
@@ -36,7 +36,7 @@ class iOSMCPError(Exception):
         return self.message
 
 
-class AppiumConnectionError(iOSMCPError):
+class AppiumConnectionError(AutomationMCPError):
     """
     Raised when unable to connect to or communicate with Appium server.
     
@@ -48,7 +48,7 @@ class AppiumConnectionError(iOSMCPError):
     pass
 
 
-class SimulatorError(iOSMCPError):
+class SimulatorError(AutomationMCPError):
     """
     Raised when iOS Simulator operations fail.
     
@@ -60,7 +60,7 @@ class SimulatorError(iOSMCPError):
     pass
 
 
-class AppLaunchError(iOSMCPError):
+class AppLaunchError(AutomationMCPError):
     """
     Raised when app launch operations fail.
     
@@ -72,7 +72,7 @@ class AppLaunchError(iOSMCPError):
     pass
 
 
-class AutomationError(iOSMCPError):
+class AutomationError(AutomationMCPError):
     """
     Raised when UI automation operations fail.
     
@@ -84,7 +84,7 @@ class AutomationError(iOSMCPError):
     pass
 
 
-class ScreenshotError(iOSMCPError):
+class ScreenshotError(AutomationMCPError):
     """
     Raised when screenshot operations fail.
     
@@ -96,7 +96,7 @@ class ScreenshotError(iOSMCPError):
     pass
 
 
-class ToolExecutionError(iOSMCPError):
+class ToolExecutionError(AutomationMCPError):
     """
     Raised when MCP tool execution fails.
     
@@ -123,7 +123,7 @@ class ToolExecutionError(iOSMCPError):
         self.original_error = original_error
 
 
-class ConfigurationError(iOSMCPError):
+class ConfigurationError(AutomationMCPError):
     """
     Raised when configuration is invalid or missing.
     
@@ -132,7 +132,7 @@ class ConfigurationError(iOSMCPError):
     pass
 
 
-class ValidationError(iOSMCPError):
+class ValidationError(AutomationMCPError):
     """
     Raised when input validation fails.
     

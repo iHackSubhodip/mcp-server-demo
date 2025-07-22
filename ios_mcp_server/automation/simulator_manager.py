@@ -11,9 +11,9 @@ from typing import Dict, Any, Optional, List
 # Add the parent directory to sys.path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from utils.command_runner import run_command
-from utils.logger import get_logger
-from utils.exceptions import SimulatorError, AppLaunchError
+from shared.utils.command_runner import run_command
+from shared.utils.logger import get_logger
+from shared.utils.exceptions import SimulatorError, AppLaunchError
 
 logger = get_logger(__name__)
 

@@ -14,7 +14,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from automation.simulator_manager import SimulatorManager
 from config.settings import settings
-from utils.exceptions import AppLaunchError
+from shared.utils.exceptions import AppLaunchError
 
 
 class LaunchAppTool:

@@ -13,7 +13,7 @@ from typing import Dict, Any, Optional, List
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from automation.screenshot_service import ScreenshotService
-from utils.exceptions import ScreenshotError
+from shared.utils.exceptions import ScreenshotError
 
 
 class ScreenshotTool:

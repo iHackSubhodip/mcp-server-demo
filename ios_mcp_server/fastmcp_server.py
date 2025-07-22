@@ -28,7 +28,7 @@ from automation.appium_client import AppiumClient
 from automation.simulator_manager import SimulatorManager
 from tools.ios.find_and_tap_tool import FindAndTapTool
 from config.settings import settings
-from utils.logger import get_logger
+from shared.utils.logger import get_logger
 
 # Initialize logger
 logger = get_logger(__name__)

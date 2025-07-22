@@ -19,8 +19,8 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 import aiohttp
 
 from config.settings import settings
-from utils.logger import get_logger
-from utils.exceptions import AppiumConnectionError, AutomationError
+from shared.utils.logger import get_logger
+from shared.utils.exceptions import AppiumConnectionError, AutomationError
 
 logger = get_logger(__name__)
 

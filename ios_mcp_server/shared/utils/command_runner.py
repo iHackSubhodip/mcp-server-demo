@@ -1,8 +1,8 @@
 """
-Shell command execution utility for iOS MCP Server.
+Shared shell command execution utility for cross-platform automation.
 
 This module provides a centralized, type-safe way to execute shell commands
-with proper logging, error handling, and timeout support.
+with proper logging, error handling, and timeout support across platforms.
 """
 
 import asyncio
@@ -10,7 +10,7 @@ from typing import List, Tuple, Optional, Dict, Any
 from dataclasses import dataclass
 
 from .logger import get_logger
-from .exceptions import iOSMCPError
+from .exceptions import AutomationMCPError
 
 logger = get_logger(__name__)
 
@@ -80,7 +80,7 @@ class CommandRunner:
             CommandResult with execution details
             
         Raises:
-            iOSMCPError: If command execution fails critically
+            AutomationMCPError: If command execution fails critically
         """
         
         cmd_str = " ".join(command)
@@ -151,7 +151,7 @@ class CommandRunner:
                 except:
                     pass
             
-            raise iOSMCPError(
+            raise AutomationMCPError(
                 error_msg,
                 context={
                     "command": cmd_str,
@@ -165,7 +165,7 @@ class CommandRunner:
             error_msg = f"Failed to execute command: {cmd_str}"
             self.logger.error(f"💥 {error_msg}: {str(e)}")
             
-            raise iOSMCPError(
+            raise AutomationMCPError(
                 error_msg,
                 context={
                     "command": cmd_str,
@@ -190,7 +190,7 @@ class CommandRunner:
         try:
             result = await self.run(command)
             return result.output, result.success
-        except iOSMCPError as e:
+        except AutomationMCPError as e:
             self.logger.error(f"Command execution failed: {e}")
             return str(e), False
 
