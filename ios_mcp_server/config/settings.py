@@ -1,95 +1,48 @@
 """
-Configuration settings for iOS MCP Server.
+Main configuration settings for iOS MCP Server.
 
-This module centralizes all configuration values, making the application
-easier to configure and deploy in different environments.
+This module combines shared and platform-specific configurations,
+providing a unified interface while supporting the new modular structure.
 """
 
-import os
 import sys
-from typing import Optional
-from dataclasses import dataclass
+from pathlib import Path
 
+# Add the ios_mcp_server directory to sys.path for imports
+sys.path.insert(0, str(Path(__file__).parent.parent))
 
-@dataclass
-class AppiumConfig:
-    """Configuration for Appium server connection."""
-    
-    host: str = "localhost"
-    port: int = 4723
-    timeout: int = 60
-    
-    @property
-    def url(self) -> str:
-        """Get the full Appium server URL."""
-        return f"http://{self.host}:{self.port}"
+# Import shared configuration classes and factories
+from shared.config import (
+    AppiumConfig,
+    ServerConfig,
+    create_appium_config,
+    create_server_config
+)
 
-
-@dataclass
-class iOSConfig:
-    """Configuration for iOS simulator and device settings."""
-    
-    platform_name: str = "iOS"
-    platform_version: str = "18.2"
-    device_name: str = "iPhone 16 Pro"
-    automation_name: str = "XCUITest"
-    no_reset: bool = True
-    new_command_timeout: int = 60
-    default_bundle_id: str = "com.apple.mobilesafari"
-
-
-@dataclass
-class ServerConfig:
-    """Configuration for the MCP server itself."""
-    
-    name: str = "ios-automation-mcp"
-    version: str = "2.0.0"
-    log_level: str = "INFO"
-    
-    # Virtual environment path for Appium scripts (dynamically determined)
-    venv_path: str = ""
-    
-    # Python version for site-packages path
-    python_version: str = ""
+# Import iOS-specific configuration classes and factories  
+from platforms.ios.config import (
+    iOSConfig,
+    create_ios_config
+)
 
 
 class Settings:
     """
-    Main settings class that loads configuration from environment variables
-    with sensible defaults.
+    Main settings class that combines shared and platform-specific configurations.
     
-    This follows the 12-factor app methodology for configuration management.
+    This class maintains the same interface as before while internally using
+    the new modular configuration structure. It loads configuration from 
+    environment variables with sensible defaults following 12-factor app methodology.
     """
     
     def __init__(self):
-        # Appium configuration
-        self.appium = AppiumConfig(
-            host=os.getenv("APPIUM_HOST", "localhost"),
-            port=int(os.getenv("APPIUM_PORT", "4723")),
-            timeout=int(os.getenv("APPIUM_TIMEOUT", "60"))
-        )
+        # Create shared configurations
+        self.appium = create_appium_config()
+        self.server = create_server_config(platform_name="ios")
         
-        # iOS configuration  
-        self.ios = iOSConfig(
-            platform_version=os.getenv("IOS_PLATFORM_VERSION", "18.2"),
-            device_name=os.getenv("IOS_DEVICE_NAME", "iPhone 16 Pro"),
-            default_bundle_id=os.getenv("IOS_DEFAULT_BUNDLE_ID", "com.apple.mobilesafari")
-        )
-        
-        # Server configuration
-        # Use the directory where this config file is located as the project root
-        config_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        project_root = os.path.dirname(config_dir)
-        default_venv_path = os.path.join(project_root, "ios_mcp_env")
-        python_version = f"python{sys.version_info.major}.{sys.version_info.minor}"
-        self.server = ServerConfig(
-            name=os.getenv("MCP_SERVER_NAME", "ios-automation-mcp"),
-            version=os.getenv("MCP_SERVER_VERSION", "2.0.0"),
-            log_level=os.getenv("LOG_LEVEL", "INFO"),
-            venv_path=os.getenv("VENV_PATH", default_venv_path),
-            python_version=os.getenv("PYTHON_VERSION", python_version)
-        )
+        # Create iOS-specific configuration
+        self.ios = create_ios_config()
 
 
-# Global settings instance
+# Global settings instance - maintains backward compatibility
 settings = Settings() 
