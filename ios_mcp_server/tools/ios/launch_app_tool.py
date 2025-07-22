@@ -42,26 +42,7 @@ class LaunchAppTool:
             "This ensures the app is running and ready for automation. "
             "Provides process information and launch status."
         )
-    
-    @property
-    def arguments(self) -> List[ToolArgument]:
-        """Define the tool arguments."""
-        return [
-            ToolArgument(
-                name="bundle_id",
-                type="string",
-                description="iOS app bundle identifier (e.g., com.apple.mobilesafari)",
-                required=True
-            ),
-            ToolArgument(
-                name="device_id",
-                type="string",
-                description="Simulator device ID (defaults to 'booted' for current active simulator)",
-                required=False,
-                default="booted"
-            )
-        ]
-    
+
     async def execute_impl(self, bundle_id: str, device_id: str = "booted") -> Dict[str, Any]:
         """
         Execute the app launch.

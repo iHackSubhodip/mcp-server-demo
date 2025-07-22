@@ -7,7 +7,7 @@ with proper error handling and file management.
 
 import sys
 from pathlib import Path
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 
 # Add the ios_mcp_server directory to sys.path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
@@ -41,32 +41,7 @@ class ScreenshotTool:
             "Automatically generates timestamped filenames and saves to the current directory. "
             "Useful for capturing app state during automation workflows."
         )
-    
-    @property
-    def arguments(self) -> List[ToolArgument]:
-        """Define the tool arguments."""
-        return [
-            ToolArgument(
-                name="filename",
-                type="string",
-                description="Custom filename for the screenshot (auto-generated if not provided)",
-                required=False
-            ),
-            ToolArgument(
-                name="device_id",
-                type="string",
-                description="Simulator device ID (defaults to 'booted' for current active simulator)",
-                required=False,
-                default="booted"
-            ),
-            ToolArgument(
-                name="directory",
-                type="string",
-                description="Directory to save the screenshot (defaults to current directory)",
-                required=False
-            )
-        ]
-    
+
     async def execute_impl(
         self, 
         filename: Optional[str] = None, 

@@ -47,33 +47,7 @@ class AppiumTapTypeTool:
             "This uses real Appium automation with multiple element finding strategies for reliability. "
             "Works with any iOS app that has text input fields."
         )
-    
-    @property
-    def arguments(self) -> List[ToolArgument]:
-        """Define the tool arguments."""
-        return [
-            ToolArgument(
-                name="text",
-                type="string",
-                description="The text to type into the text field",
-                required=True
-            ),
-            ToolArgument(
-                name="app_bundle_id",
-                type="string",
-                description=f"iOS app bundle ID (defaults to {settings.ios.default_bundle_id})",
-                required=False,
-                default=settings.ios.default_bundle_id
-            ),
-            ToolArgument(
-                name="timeout",
-                type="number",
-                description="Timeout in seconds for finding the text field (default: 10)",
-                required=False,
-                default=10
-            )
-        ]
-    
+
     async def execute_impl(self, text: str, app_bundle_id: str = None, timeout: int = 10) -> Dict[str, Any]:
         """
         Execute the tap and type automation.
