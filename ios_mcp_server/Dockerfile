@@ -19,15 +19,16 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-# Install uv
-COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
+# Install uv using the installer script (more reliable)
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh && \
+    mv /root/.local/bin/uv /usr/local/bin/uv
 
 # Debug: List what's available in build context
 RUN echo "=== Build context contents ===" && ls -la
 
 # Copy project files and install dependencies
-COPY ../pyproject.toml ./
-COPY ../uv.lock* ./
+COPY pyproject.toml ./
+COPY uv.lock* ./
 RUN uv sync --frozen --no-dev --no-cache
 
 # Copy application code (current directory is already ios_mcp_server)
