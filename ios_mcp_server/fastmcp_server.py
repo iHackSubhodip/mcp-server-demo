@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Modern FastMCP iOS Automation Server
+Modern FastMCP Mobile automation iOS MCP server
 
 A clean FastMCP 2.0 implementation that leverages all existing iOS automation
 services while providing FastMCP's modern, Pythonic interface.

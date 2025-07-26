@@ -1,4 +1,4 @@
-# iOS MCP Server
+# Mobile automation iOS MCP server
 
 > Modern iOS automation server built with FastMCP 2.0 and clean architecture
 
@@ -12,9 +12,9 @@ A production-ready iOS automation MCP server built with FastMCP 2.0, featuring *
 
 ## 📺 Demo Video
 
-[![iOS MCP Server Demo](https://img.youtube.com/vi/480AmvL9ziQ/maxresdefault.jpg)](https://youtu.be/fVqE7nLfqoE)
+[![Mobile automation iOS MCP server Demo](https://img.youtube.com/vi/480AmvL9ziQ/maxresdefault.jpg)](https://youtu.be/fVqE7nLfqoE)
 
-**🎬 Watch the Complete Demo**: [iOS MCP Server in Action](https://youtu.be/fVqE7nLfqoE)
+**🎬 Watch the Complete Demo**: [Mobile automation iOS MCP server in Action](https://youtu.be/fVqE7nLfqoE)
 
 ## ✨ Features
 
@@ -79,7 +79,7 @@ Use the hosted version on Railway - no local setup required:
 
 ## 🏗️ Architecture
 
-The iOS MCP Server features a **clean, modular architecture** with complete platform segregation achieved through a comprehensive 6-phase refactoring. This design enables maximum maintainability, zero code duplication, and seamless cross-platform expansion.
+The Mobile automation iOS MCP server features a **clean, modular architecture** with complete platform segregation achieved through a comprehensive 6-phase refactoring. This design enables maximum maintainability, zero code duplication, and seamless cross-platform expansion.
 
 ### ✨ Architecture Achievements
 

@@ -1,4 +1,4 @@
-# 🚀 iOS MCP Server Setup Guide
+# 🚀 Mobile automation iOS MCP server Setup Guide
 
 Complete step-by-step guide to recreate the working iOS automation setup with Railway + ngrok.
 

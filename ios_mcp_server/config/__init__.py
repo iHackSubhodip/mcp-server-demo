@@ -1,5 +1,5 @@
 """
-Main configuration module for iOS MCP Server.
+Main configuration module for Mobile automation iOS MCP server.
 
 This module provides the unified configuration interface that combines
 shared and platform-specific configurations.
