@@ -12,7 +12,7 @@ import sys
 from pathlib import Path
 from typing import Dict, Any, Optional, List
 
-# Add the ios_mcp_server directory to sys.path for proper imports
+# Add the mobile-automation-mcp-server directory to sys.path for proper imports
 sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
 
 from ..automation.appium_client import AppiumClient

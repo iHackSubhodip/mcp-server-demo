@@ -1,5 +1,5 @@
 [project]
-name = "ios-mcp-server"
+name = "mobile-automation-mcp-server"
 version = "1.0.0"
 description = "Modern iOS automation server built with FastMCP 2.0"
 requires-python = ">=3.11"

@@ -11,9 +11,9 @@ import logging
 from pathlib import Path
 from typing import Optional
 
-# Add the ios_mcp_server directory to sys.path 
-ios_mcp_server_dir = Path(__file__).parent.parent.parent.resolve()
-sys.path.insert(0, str(ios_mcp_server_dir))
+# Add the mobile-automation-mcp-server directory to sys.path
+mobile_automation_mcp_server_dir = Path(__file__).parent.parent.parent.resolve()
+sys.path.insert(0, str(mobile_automation_mcp_server_dir))
 
 from config.settings import settings
 

@@ -13,7 +13,7 @@ import sys
 from pathlib import Path
 from typing import Dict, Any, List, Optional, Union
 
-# Add the ios_mcp_server directory to sys.path
+# Add the mobile-automation-mcp-server directory to sys.path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
 
 from ..automation.appium_client import AppiumClient
@@ -278,7 +278,7 @@ class FindAndTapTool:
         """
         
         # Import settings for configuration
-        from ios_mcp_server.config.settings import settings
+        from config.settings import settings
         
         # Build strategy implementations
         strategy_implementations = []

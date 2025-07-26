@@ -8,7 +8,7 @@ providing a unified interface while supporting the new modular structure.
 import sys
 from pathlib import Path
 
-# Add the ios_mcp_server directory to sys.path for imports
+# Add the mobile-automation-mcp-server directory to sys.path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 # Import shared configuration classes and factories

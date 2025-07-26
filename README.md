@@ -76,7 +76,7 @@ Use the hosted version on Railway - no local setup required:
      "mcpServers": {
        "ios-automation-local": {
          "command": "uv",
-         "args": ["run", "python", "ios_mcp_server/fastmcp_server.py"],
+         "args": ["run", "python", "mobile-automation-mcp-server/fastmcp_server.py"],
          "cwd": "/path/to/mcp-server-demo"
        }
      }
@@ -109,7 +109,7 @@ The Mobile automation iOS MCP server features a **clean, modular architecture** 
 
 ### Directory Structure
 ```
-ios_mcp_server/
+mobile-automation-mcp-server/
 ├── fastmcp_server.py          # 🚀 FastMCP 2.0 server (main entry)
 ├── config/
 │   └── settings.py           # 🔧 Unified configuration interface
@@ -206,7 +206,7 @@ Check server and Appium status
 ### Local Development Commands
 ```bash
 # Run FastMCP server locally (with uv)
-uv run python ios_mcp_server/fastmcp_server.py
+uv run python mobile-automation-mcp-server/fastmcp_server.py
 
 # Install dependencies (if needed)
 uv sync

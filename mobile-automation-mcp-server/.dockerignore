@@ -15,5 +15,5 @@ moduleInteractionDiagram.png
 sequenceDiagram.png
 claude_desktop_config*.json
 
-# But include ios_mcp_server directory
-!ios_mcp_server/ 
+# But include mobile-automation-mcp-server directory
+!mobile-automation-mcp-server/ 

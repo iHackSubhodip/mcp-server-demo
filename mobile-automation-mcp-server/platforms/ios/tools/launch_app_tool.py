@@ -9,7 +9,7 @@ import sys
 from pathlib import Path
 from typing import Dict, Any, List
 
-# Add the ios_mcp_server directory to sys.path
+# Add the mobile-automation-mcp-server directory to sys.path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
 
 from ..automation.simulator_manager import SimulatorManager
