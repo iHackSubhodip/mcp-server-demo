@@ -26,13 +26,13 @@ RUN curl -LsSf https://astral.sh/uv/install.sh | sh && \
 # Debug: List what's available in build context
 RUN echo "=== Build context contents ===" && ls -la
 
-# Copy project files and install dependencies
+# Copy project files from root directory (build context should be set to root)
 COPY pyproject.toml ./
 COPY uv.lock* ./
 RUN uv sync --frozen --no-dev --no-cache
 
-# Copy application code (current directory is already ios_mcp_server)
-COPY . .
+# Copy application code from ios_mcp_server directory
+COPY ios_mcp_server/ ./
 
 # Create non-root user
 RUN useradd -m -u 1000 fastmcp && \
