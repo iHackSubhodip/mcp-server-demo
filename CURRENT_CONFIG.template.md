@@ -1,5 +1,6 @@
 # Current Working Configuration Template
 
+
 ## ngrok Configuration
 ### ngrok Auth Token
 ```
