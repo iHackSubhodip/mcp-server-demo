@@ -183,7 +183,7 @@ class AppiumTapTypeTool:
             suggestions.extend([
                 "Verify Appium Python client is installed in virtual environment",
                 "Check virtual environment path in configuration",
-                "Reinstall dependencies: pip install -r requirements.txt"
+                "Reinstall dependencies: uv sync"
             ])
         
         # Simulator/device errors

@@ -54,6 +54,7 @@ Use the hosted version on Railway - no local setup required:
 1. **Prerequisites**
    - macOS (required for iOS automation)
    - Python 3.11+
+   - [uv](https://docs.astral.sh/uv/) (recommended) or pip
    - Xcode with iOS Simulator
    - Node.js (for Appium)
 
@@ -61,7 +62,12 @@ Use the hosted version on Railway - no local setup required:
    ```bash
    git clone https://github.com/iHackSubhodip/mcp-server-demo.git
    cd mcp-server-demo
-   pip install -r ios_mcp_server/requirements.txt
+   
+   # Using uv (recommended)
+   uv sync
+   
+   # Or using pip (legacy)
+   pip install -e .
    ```
 
 3. **Claude Desktop Configuration**
@@ -69,8 +75,8 @@ Use the hosted version on Railway - no local setup required:
    {
      "mcpServers": {
        "ios-automation-local": {
-         "command": "python",
-         "args": ["ios_mcp_server/fastmcp_server.py"],
+         "command": "uv",
+         "args": ["run", "python", "ios_mcp_server/fastmcp_server.py"],
          "cwd": "/path/to/mcp-server-demo"
        }
      }
@@ -129,7 +135,7 @@ ios_mcp_server/
 ├── screenshots/             # 📁 Screenshot storage
 ├── Dockerfile              # 🐳 Container deployment
 ├── Procfile                # 🚂 Railway deployment
-└── requirements.txt        # 📦 Dependencies
+└── pyproject.toml          # 📦 Dependencies & project config
 ```
 
 ### 🎯 Benefits Achieved
@@ -199,11 +205,14 @@ Check server and Appium status
 
 ### Local Development Commands
 ```bash
-# Run FastMCP server locally
-cd ios_mcp_server && python fastmcp_server.py
+# Run FastMCP server locally (with uv)
+uv run python ios_mcp_server/fastmcp_server.py
 
 # Install dependencies (if needed)
-pip install -r requirements.txt
+uv sync
+
+# Development mode (with dev dependencies)
+uv sync --dev
 ```
 
 ### Appium Setup
@@ -276,12 +285,21 @@ pkill -f appium && appium server --port 4723
 
 ## 📝 Dependencies
 
-Core dependencies:
+Core dependencies managed via `pyproject.toml`:
 - `fastmcp>=2.9.2` - FastMCP 2.0 framework
 - `mcp>=1.0.0` - Traditional MCP protocol
 - `aiohttp>=3.9.0` - HTTP client for automation
 - `appium-python-client>=3.0.0` - iOS automation
 - `pydantic>=2.4.0` - Data validation
+
+Install with:
+```bash
+# Using uv (recommended)
+uv sync
+
+# Or using pip
+pip install -e .
+```
 
 ## 🤝 Contributing
 

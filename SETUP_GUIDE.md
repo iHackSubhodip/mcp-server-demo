@@ -8,6 +8,7 @@ Complete step-by-step guide to recreate the working iOS automation setup with Ra
 - **Xcode** with iOS Simulator installed
 - **Node.js** (for Appium)
 - **Python 3.11+**
+- **[uv](https://docs.astral.sh/uv/)** (recommended) or pip
 - **ngrok account** with auth token
 - **Railway account** with deployed project
 
