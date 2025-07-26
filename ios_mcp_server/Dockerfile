@@ -23,16 +23,30 @@ RUN apt-get update && \
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh && \
     mv /root/.local/bin/uv /usr/local/bin/uv
 
-# Debug: List what's available in build context
-RUN echo "=== Build context contents ===" && ls -la
+# Create a minimal pyproject.toml for uv to work
+RUN echo '[project]' > pyproject.toml && \
+    echo 'name = "ios-mcp-server"' >> pyproject.toml && \
+    echo 'version = "1.0.0"' >> pyproject.toml && \
+    echo 'requires-python = ">=3.11"' >> pyproject.toml && \
+    echo 'dependencies = [' >> pyproject.toml && \
+    echo '    "fastmcp>=2.9.2",' >> pyproject.toml && \
+    echo '    "starlette>=0.27.0",' >> pyproject.toml && \
+    echo '    "uvicorn>=0.23.0",' >> pyproject.toml && \
+    echo '    "mcp>=1.0.0",' >> pyproject.toml && \
+    echo '    "aiohttp>=3.9.0",' >> pyproject.toml && \
+    echo '    "appium-python-client>=3.0.0",' >> pyproject.toml && \
+    echo '    "selenium>=4.15.0",' >> pyproject.toml && \
+    echo '    "pillow>=10.0.0",' >> pyproject.toml && \
+    echo '    "requests>=2.31.0",' >> pyproject.toml && \
+    echo '    "pydantic>=2.4.0",' >> pyproject.toml && \
+    echo '    "pydantic-settings>=2.0.0",' >> pyproject.toml && \
+    echo ']' >> pyproject.toml
 
-# Copy project files from root directory (build context should be set to root)
-COPY pyproject.toml ./
-COPY uv.lock* ./
-RUN uv sync --frozen --no-dev --no-cache
+# Install dependencies
+RUN uv sync --no-dev --no-cache
 
-# Copy application code from ios_mcp_server directory
-COPY ios_mcp_server/ ./
+# Copy application code (we're already in ios_mcp_server context)
+COPY . .
 
 # Create non-root user
 RUN useradd -m -u 1000 fastmcp && \
