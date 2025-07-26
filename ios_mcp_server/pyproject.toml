@@ -5,65 +5,21 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "ios-mcp-server"
 version = "1.0.0"
-description = "Modern iOS automation server built with FastMCP 2.0 and clean architecture"
-authors = [
-    {name = "iHackSubhodip", email = "write2subhodip@gmail.com"}
-]
-license = "MIT"
+description = "Modern iOS automation server built with FastMCP 2.0"
+authors = [{name = "iHackSubhodip", email = "write2subhodip@gmail.com"}]
+license = {text = "MIT"}
 requires-python = ">=3.11"
-keywords = ["mcp", "ios", "automation", "fastmcp", "appium"]
-classifiers = [
-    "Development Status :: 4 - Beta",
-    "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
-    "Operating System :: MacOS",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
-    "Topic :: Software Development :: Testing",
-    "Topic :: System :: Hardware :: Hardware Drivers",
-]
 
 dependencies = [
-    # FastMCP and dependencies
     "fastmcp>=2.9.2",
     "starlette>=0.27.0",
     "uvicorn>=0.23.0",
-    
-    # MCP SDK for traditional MCP server
     "mcp>=1.0.0",
-    
-    # HTTP client for Railway proxy
     "aiohttp>=3.9.0",
-    
-    # iOS automation dependencies
     "appium-python-client>=3.0.0",
     "selenium>=4.15.0",
     "pillow>=10.0.0",
     "requests>=2.31.0",
-    
-    # Core utilities
     "pydantic>=2.4.0",
     "pydantic-settings>=2.0.0",
 ]
-
-[project.optional-dependencies]
-dev = [
-    "pytest>=7.4.0",
-    "pytest-asyncio>=0.21.0",
-    "black>=23.0.0",
-    "ruff>=0.1.0",
-]
-
-[project.urls]
-Homepage = "https://github.com/iHackSubhodip/mcp-server-demo"
-Repository = "https://github.com/iHackSubhodip/mcp-server-demo"
-Issues = "https://github.com/iHackSubhodip/mcp-server-demo/issues"
-
-[tool.black]
-line-length = 88
-target-version = ['py311']
-
-[tool.ruff]
-line-length = 88
-target-version = "py311"
-select = ["E", "F", "W", "I", "N", "UP"]
