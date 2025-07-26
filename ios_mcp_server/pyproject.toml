@@ -1,6 +1,6 @@
 [build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
 
 [project]
 name = "ios-mcp-server"
@@ -9,7 +9,7 @@ description = "Modern iOS automation server built with FastMCP 2.0 and clean arc
 authors = [
     {name = "iHackSubhodip", email = "write2subhodip@gmail.com"}
 ]
-license = {text = "MIT"}
+license = "MIT"
 requires-python = ">=3.11"
 keywords = ["mcp", "ios", "automation", "fastmcp", "appium"]
 classifiers = [
@@ -52,25 +52,12 @@ dev = [
     "pytest-asyncio>=0.21.0",
     "black>=23.0.0",
     "ruff>=0.1.0",
-    "mypy>=1.5.0",
 ]
 
 [project.urls]
 Homepage = "https://github.com/iHackSubhodip/mcp-server-demo"
 Repository = "https://github.com/iHackSubhodip/mcp-server-demo"
 Issues = "https://github.com/iHackSubhodip/mcp-server-demo/issues"
-
-[project.scripts]
-ios-mcp-server = "ios_mcp_server.fastmcp_server:main"
-
-[tool.uv]
-dev-dependencies = [
-    "pytest>=7.4.0",
-    "pytest-asyncio>=0.21.0",
-    "black>=23.0.0",
-    "ruff>=0.1.0",
-    "mypy>=1.5.0",
-]
 
 [tool.black]
 line-length = 88
@@ -80,9 +67,3 @@ target-version = ['py311']
 line-length = 88
 target-version = "py311"
 select = ["E", "F", "W", "I", "N", "UP"]
-
-[tool.mypy]
-python_version = "3.11"
-warn_return_any = true
-warn_unused_configs = true
-disallow_untyped_defs = true 
